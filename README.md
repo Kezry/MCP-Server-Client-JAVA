@@ -7,7 +7,13 @@
 ## 📚 参考文档
 
 #### MCP Java SDK 文档
-有关完整指南和SDK API文档，请访问[MCP Java SDK参考文档](https://modelcontextprotocol.io/sdk/java/mcp-overview)。
+有关完整指南和SDK API文档，请访问
+
+[MCP Java SDK参考文档](./mcp-overview.md)
+
+[MCP Java 客户端参考文档](./mcp-client.md)
+
+[MCP Java 服务端参考文档](./mcp-server.md)
 
 #### Spring AI MCP 文档
 [Spring AI MCP](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-overview.html)通过Spring Boot集成扩展了MCP Java SDK，提供了[客户端](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-client-boot-starter-docs.html)和[服务器端](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html)启动器。使用[Spring Initializer](https://start.spring.io)引导您的AI应用程序以支持MCP。
