@@ -33,39 +33,37 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * The Model Context Protocol (MCP) server implementation that provides asynchronous
- * communication using Project Reactor's Mono and Flux types.
+ * 模型上下文协议(MCP)服务器实现，使用Project Reactor的Mono和Flux类型提供异步
+ * 通信。
  *
  * <p>
- * This server implements the MCP specification, enabling AI models to expose tools,
- * resources, and prompts through a standardized interface. Key features include:
+ * 此服务器实现了MCP规范，使AI模型能够通过标准化接口暴露工具、资源和提示。
+ * 主要特性包括：
  * <ul>
- * <li>Asynchronous communication using reactive programming patterns
- * <li>Dynamic tool registration and management
- * <li>Resource handling with URI-based addressing
- * <li>Prompt template management
- * <li>Real-time client notifications for state changes
- * <li>Structured logging with configurable severity levels
- * <li>Support for client-side AI model sampling
+ * <li>使用响应式编程模式的异步通信
+ * <li>动态工具注册和管理
+ * <li>基于URI寻址的资源处理
+ * <li>提示模板管理
+ * <li>状态变更的实时客户端通知
+ * <li>可配置严重级别的结构化日志记录
+ * <li>支持客户端AI模型采样
  * </ul>
  *
  * <p>
- * The server follows a lifecycle:
+ * 服务器遵循以下生命周期：
  * <ol>
- * <li>Initialization - Accepts client connections and negotiates capabilities
- * <li>Normal Operation - Handles client requests and sends notifications
- * <li>Graceful Shutdown - Ensures clean connection termination
+ * <li>初始化 - 接受客户端连接并协商能力
+ * <li>正常运行 - 处理客户端请求并发送通知
+ * <li>优雅关闭 - 确保连接清理终止
  * </ol>
  *
  * <p>
- * This implementation uses Project Reactor for non-blocking operations, making it
- * suitable for high-throughput scenarios and reactive applications. All operations return
- * Mono or Flux types that can be composed into reactive pipelines.
+ * 此实现使用Project Reactor进行非阻塞操作，使其适用于高吞吐量场景和响应式
+ * 应用。所有操作都返回可以组合成响应式管道的Mono或Flux类型。
  *
  * <p>
- * The server supports runtime modification of its capabilities through methods like
- * {@link #addTool}, {@link #addResource}, and {@link #addPrompt}, automatically notifying
- * connected clients of changes when configured to do so.
+ * 服务器支持通过{@link #addTool}、{@link #addResource}和{@link #addPrompt}等
+ * 方法在运行时修改其能力，并在配置为这样做时自动通知已连接的客户端变更。
  *
  * @author Christian Tzolov
  * @author Dariusz Jędrzejczyk
@@ -85,11 +83,10 @@ public class McpAsyncServer {
 	}
 
 	/**
-	 * Create a new McpAsyncServer with the given transport provider and capabilities.
-	 * @param mcpTransportProvider The transport layer implementation for MCP
-	 * communication.
-	 * @param features The MCP server supported features.
-	 * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
+	 * 使用给定的传输提供者和能力创建新的McpAsyncServer。
+	 * @param mcpTransportProvider MCP通信的传输层实现。
+	 * @param features MCP服务器支持的功能。
+	 * @param objectMapper 用于JSON序列化/反序列化的ObjectMapper
 	 */
 	McpAsyncServer(McpServerTransportProvider mcpTransportProvider, ObjectMapper objectMapper,
 			McpServerFeatures.Async features, Duration requestTimeout) {
@@ -97,31 +94,31 @@ public class McpAsyncServer {
 	}
 
 	/**
-	 * Get the server capabilities that define the supported features and functionality.
-	 * @return The server capabilities
+	 * 获取定义支持的特性和功能的服务器能力。
+	 * @return 服务器能力
 	 */
 	public McpSchema.ServerCapabilities getServerCapabilities() {
 		return this.delegate.getServerCapabilities();
 	}
 
 	/**
-	 * Get the server implementation information.
-	 * @return The server implementation details
+	 * 获取服务器实现信息。
+	 * @return 服务器实现详情
 	 */
 	public McpSchema.Implementation getServerInfo() {
 		return this.delegate.getServerInfo();
 	}
 
 	/**
-	 * Gracefully closes the server, allowing any in-progress operations to complete.
-	 * @return A Mono that completes when the server has been closed
+	 * 优雅地关闭服务器，允许任何正在进行的操作完成。
+	 * @return 当服务器已关闭时完成的Mono
 	 */
 	public Mono<Void> closeGracefully() {
 		return this.delegate.closeGracefully();
 	}
 
 	/**
-	 * Close the server immediately.
+	 * 立即关闭服务器。
 	 */
 	public void close() {
 		this.delegate.close();
@@ -131,26 +128,26 @@ public class McpAsyncServer {
 	// Tool Management
 	// ---------------------------------------
 	/**
-	 * Add a new tool specification at runtime.
-	 * @param toolSpecification The tool specification to add
-	 * @return Mono that completes when clients have been notified of the change
+	 * 在运行时添加新的工具规范。
+	 * @param toolSpecification 要添加的工具规范
+	 * @return 当客户端已被通知变更时完成的Mono
 	 */
 	public Mono<Void> addTool(McpServerFeatures.AsyncToolSpecification toolSpecification) {
 		return this.delegate.addTool(toolSpecification);
 	}
 
 	/**
-	 * Remove a tool handler at runtime.
-	 * @param toolName The name of the tool handler to remove
-	 * @return Mono that completes when clients have been notified of the change
+	 * 在运行时移除工具处理程序。
+	 * @param toolName 要移除的工具处理程序的名称
+	 * @return 当客户端已被通知变更时完成的Mono
 	 */
 	public Mono<Void> removeTool(String toolName) {
 		return this.delegate.removeTool(toolName);
 	}
 
 	/**
-	 * Notifies clients that the list of available tools has changed.
-	 * @return A Mono that completes when all clients have been notified
+	 * 通知客户端可用工具列表已更改。
+	 * @return 当所有客户端都已被通知时完成的Mono
 	 */
 	public Mono<Void> notifyToolsListChanged() {
 		return this.delegate.notifyToolsListChanged();
@@ -160,26 +157,26 @@ public class McpAsyncServer {
 	// Resource Management
 	// ---------------------------------------
 	/**
-	 * Add a new resource handler at runtime.
-	 * @param resourceHandler The resource handler to add
-	 * @return Mono that completes when clients have been notified of the change
+	 * 在运行时添加新的资源处理程序。
+	 * @param resourceHandler 要添加的资源处理程序
+	 * @return 当客户端已被通知变更时完成的Mono
 	 */
 	public Mono<Void> addResource(McpServerFeatures.AsyncResourceSpecification resourceHandler) {
 		return this.delegate.addResource(resourceHandler);
 	}
 
 	/**
-	 * Remove a resource handler at runtime.
-	 * @param resourceUri The URI of the resource handler to remove
-	 * @return Mono that completes when clients have been notified of the change
+	 * 在运行时移除资源处理程序。
+	 * @param resourceUri 要移除的资源处理程序的URI
+	 * @return 当客户端已被通知变更时完成的Mono
 	 */
 	public Mono<Void> removeResource(String resourceUri) {
 		return this.delegate.removeResource(resourceUri);
 	}
 
 	/**
-	 * Notifies clients that the list of available resources has changed.
-	 * @return A Mono that completes when all clients have been notified
+	 * 通知客户端可用资源列表已更改。
+	 * @return 当所有客户端都已被通知时完成的Mono
 	 */
 	public Mono<Void> notifyResourcesListChanged() {
 		return this.delegate.notifyResourcesListChanged();
@@ -189,9 +186,9 @@ public class McpAsyncServer {
 	// Prompt Management
 	// ---------------------------------------
 	/**
-	 * Add a new prompt handler at runtime.
-	 * @param promptSpecification The prompt handler to add
-	 * @return Mono that completes when clients have been notified of the change
+	 * 在运行时添加新的提示处理程序。
+	 * @param promptSpecification 要添加的提示处理程序
+	 * @return 当客户端已被通知变更时完成的Mono
 	 */
 	public Mono<Void> addPrompt(McpServerFeatures.AsyncPromptSpecification promptSpecification) {
 		return this.delegate.addPrompt(promptSpecification);

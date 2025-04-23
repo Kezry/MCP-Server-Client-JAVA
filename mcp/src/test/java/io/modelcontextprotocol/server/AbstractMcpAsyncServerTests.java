@@ -29,8 +29,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Test suite for the {@link McpAsyncServer} that can be used with different
- * {@link McpTransportProvider} implementations.
+ * 用于测试{@link McpAsyncServer}的测试套件，可以与不同的
+ * {@link McpTransportProvider}实现一起使用。
  *
  * @author Christian Tzolov
  */
@@ -60,7 +60,7 @@ public abstract class AbstractMcpAsyncServerTests {
 	}
 
 	// ---------------------------------------
-	// Server Lifecycle Tests
+	// 服务器生命周期测试
 	// ---------------------------------------
 
 	@Test
@@ -90,7 +90,7 @@ public abstract class AbstractMcpAsyncServerTests {
 	}
 
 	// ---------------------------------------
-	// Tools Tests
+	// 工具测试
 	// ---------------------------------------
 	String emptyJsonSchema = """
 			{
@@ -181,7 +181,7 @@ public abstract class AbstractMcpAsyncServerTests {
 	}
 
 	// ---------------------------------------
-	// Resources Tests
+	// 资源测试
 	// ---------------------------------------
 
 	@Test
@@ -257,7 +257,7 @@ public abstract class AbstractMcpAsyncServerTests {
 	}
 
 	// ---------------------------------------
-	// Prompts Tests
+	// 提示测试
 	// ---------------------------------------
 
 	@Test
@@ -350,7 +350,7 @@ public abstract class AbstractMcpAsyncServerTests {
 	}
 
 	// ---------------------------------------
-	// Roots Tests
+	// 根节点测试
 	// ---------------------------------------
 
 	@Test

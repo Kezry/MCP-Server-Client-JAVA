@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link StdioServerTransportProvider}.
+ * 用于测试 {@link StdioServerTransportProvider} 的测试类。
  *
  * @author Christian Tzolov
  */

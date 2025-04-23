@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2024 the original author or authors.
+ * Copyright 2024-2024 原始作者保留所有权利。
  */
 
 package io.modelcontextprotocol.spec;
@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Based on the <a href="http://www.jsonrpc.org/specification">JSON-RPC 2.0
- * specification</a> and the <a href=
- * "https://github.com/modelcontextprotocol/specification/blob/main/schema/2024-11-05/schema.ts">Model
- * Context Protocol Schema</a>.
+ * 基于<a href="http://www.jsonrpc.org/specification">JSON-RPC 2.0
+ * 规范</a>和<a href=
+ * "https://github.com/modelcontextprotocol/specification/blob/main/schema/2024-11-05/schema.ts">模型
+ * 上下文协议模式</a>。
  *
  * @author Christian Tzolov
  */
@@ -42,24 +42,24 @@ public final class McpSchema {
 	public static final String JSONRPC_VERSION = "2.0";
 
 	// ---------------------------
-	// Method Names
+	// 方法名称
 	// ---------------------------
 
-	// Lifecycle Methods
+	// 生命周期方法
 	public static final String METHOD_INITIALIZE = "initialize";
 
 	public static final String METHOD_NOTIFICATION_INITIALIZED = "notifications/initialized";
 
 	public static final String METHOD_PING = "ping";
 
-	// Tool Methods
+	// 工具方法
 	public static final String METHOD_TOOLS_LIST = "tools/list";
 
 	public static final String METHOD_TOOLS_CALL = "tools/call";
 
 	public static final String METHOD_NOTIFICATION_TOOLS_LIST_CHANGED = "notifications/tools/list_changed";
 
-	// Resources Methods
+	// 资源方法
 	public static final String METHOD_RESOURCES_LIST = "resources/list";
 
 	public static final String METHOD_RESOURCES_READ = "resources/read";
@@ -72,7 +72,7 @@ public final class McpSchema {
 
 	public static final String METHOD_RESOURCES_UNSUBSCRIBE = "resources/unsubscribe";
 
-	// Prompt Methods
+	// 提示方法
 	public static final String METHOD_PROMPT_LIST = "prompts/list";
 
 	public static final String METHOD_PROMPT_GET = "prompts/get";
@@ -81,51 +81,51 @@ public final class McpSchema {
 
 	public static final String METHOD_COMPLETION_COMPLETE = "completion/complete";
 
-	// Logging Methods
+	// 日志方法
 	public static final String METHOD_LOGGING_SET_LEVEL = "logging/setLevel";
 
 	public static final String METHOD_NOTIFICATION_MESSAGE = "notifications/message";
 
-	// Roots Methods
+	// 根方法
 	public static final String METHOD_ROOTS_LIST = "roots/list";
 
 	public static final String METHOD_NOTIFICATION_ROOTS_LIST_CHANGED = "notifications/roots/list_changed";
 
-	// Sampling Methods
+	// 采样方法
 	public static final String METHOD_SAMPLING_CREATE_MESSAGE = "sampling/createMessage";
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	// ---------------------------
-	// JSON-RPC Error Codes
+	// JSON-RPC 错误代码
 	// ---------------------------
 	/**
-	 * Standard error codes used in MCP JSON-RPC responses.
+	 * MCP JSON-RPC响应中使用的标准错误代码。
 	 */
 	public static final class ErrorCodes {
 
 		/**
-		 * Invalid JSON was received by the server.
+		 * 服务器接收到无效的JSON。
 		 */
 		public static final int PARSE_ERROR = -32700;
 
 		/**
-		 * The JSON sent is not a valid Request object.
+		 * 发送的JSON不是有效的请求对象。
 		 */
 		public static final int INVALID_REQUEST = -32600;
 
 		/**
-		 * The method does not exist / is not available.
+		 * 方法不存在或不可用。
 		 */
 		public static final int METHOD_NOT_FOUND = -32601;
 
 		/**
-		 * Invalid method parameter(s).
+		 * 无效的方法参数。
 		 */
 		public static final int INVALID_PARAMS = -32602;
 
 		/**
-		 * Internal JSON-RPC error.
+		 * 内部JSON-RPC错误。
 		 */
 		public static final int INTERNAL_ERROR = -32603;
 
@@ -140,14 +140,13 @@ public final class McpSchema {
 	};
 
 	/**
-	 * Deserializes a JSON string into a JSONRPCMessage object.
-	 * @param objectMapper The ObjectMapper instance to use for deserialization
-	 * @param jsonText The JSON string to deserialize
-	 * @return A JSONRPCMessage instance using either the {@link JSONRPCRequest},
-	 * {@link JSONRPCNotification}, or {@link JSONRPCResponse} classes.
-	 * @throws IOException If there's an error during deserialization
-	 * @throws IllegalArgumentException If the JSON structure doesn't match any known
-	 * message type
+	 * 将JSON字符串反序列化为JSONRPCMessage对象。
+	 * @param objectMapper 用于反序列化的ObjectMapper实例
+	 * @param jsonText 要反序列化的JSON字符串
+	 * @return 使用{@link JSONRPCRequest}、{@link JSONRPCNotification}
+	 * 或{@link JSONRPCResponse}类的JSONRPCMessage实例。
+	 * @throws IOException 如果在反序列化过程中出现错误
+	 * @throws IllegalArgumentException 如果JSON结构与任何已知的消息类型都不匹配
 	 */
 	public static JSONRPCMessage deserializeJsonRpcMessage(ObjectMapper objectMapper, String jsonText)
 			throws IOException {
@@ -156,7 +155,7 @@ public final class McpSchema {
 
 		var map = objectMapper.readValue(jsonText, MAP_TYPE_REF);
 
-		// Determine message type based on specific JSON structure
+		// 根据特定的JSON结构确定消息类型
 		if (map.containsKey("method") && map.containsKey("id")) {
 			return objectMapper.convertValue(map, JSONRPCRequest.class);
 		}
@@ -171,7 +170,7 @@ public final class McpSchema {
 	}
 
 	// ---------------------------
-	// JSON-RPC Message Types
+	// JSON-RPC 消息类型
 	// ---------------------------
 	public sealed interface JSONRPCMessage permits JSONRPCRequest, JSONRPCNotification, JSONRPCResponse {
 

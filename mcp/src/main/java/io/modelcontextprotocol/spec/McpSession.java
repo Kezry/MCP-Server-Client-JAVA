@@ -10,14 +10,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import reactor.core.publisher.Mono;
 
 /**
- * Represents a Model Control Protocol (MCP) session that handles communication between
- * clients and the server. This interface provides methods for sending requests and
- * notifications, as well as managing the session lifecycle.
+ * 表示处理客户端和服务器之间通信的模型控制协议(MCP)会话。
+ * 此接口提供了发送请求和通知的方法，以及管理会话生命周期。
  *
  * <p>
- * The session operates asynchronously using Project Reactor's {@link Mono} type for
- * non-blocking operations. It supports both request-response patterns and one-way
- * notifications.
+ * 会话使用Project Reactor的{@link Mono}类型进行异步操作。
+ * 它支持请求-响应模式和单向通知。
  * </p>
  *
  * @author Christian Tzolov
@@ -26,56 +24,54 @@ import reactor.core.publisher.Mono;
 public interface McpSession {
 
 	/**
-	 * Sends a request to the model counterparty and expects a response of type T.
+	 * 向模型对方发送请求并期望类型为T的响应。
 	 *
 	 * <p>
-	 * This method handles the request-response pattern where a response is expected from
-	 * the client or server. The response type is determined by the provided
-	 * TypeReference.
+	 * 此方法处理请求-响应模式，其中期望从客户端或服务器获得响应。
+	 * 响应类型由提供的TypeReference确定。
 	 * </p>
-	 * @param <T> the type of the expected response
-	 * @param method the name of the method to be called on the counterparty
-	 * @param requestParams the parameters to be sent with the request
-	 * @param typeRef the TypeReference describing the expected response type
-	 * @return a Mono that will emit the response when received
+	 * @param <T> 预期响应的类型
+	 * @param method 要在对方调用的方法名称
+	 * @param requestParams 要与请求一起发送的参数
+	 * @param typeRef 描述预期响应类型的TypeReference
+	 * @return 在收到响应时发出响应的Mono
 	 */
 	<T> Mono<T> sendRequest(String method, Object requestParams, TypeReference<T> typeRef);
 
 	/**
-	 * Sends a notification to the model client or server without parameters.
+	 * 向模型客户端或服务器发送不带参数的通知。
 	 *
 	 * <p>
-	 * This method implements the notification pattern where no response is expected from
-	 * the counterparty. It's useful for fire-and-forget scenarios.
+	 * 此方法实现了通知模式，其中不期望从对方获得响应。
+	 * 它适用于发送后不需要关注结果的场景。
 	 * </p>
-	 * @param method the name of the notification method to be called on the server
-	 * @return a Mono that completes when the notification has been sent
+	 * @param method 要在服务器上调用的通知方法的名称
+	 * @return 当通知发送完成时完成的Mono
 	 */
 	default Mono<Void> sendNotification(String method) {
 		return sendNotification(method, null);
 	}
 
 	/**
-	 * Sends a notification to the model client or server with parameters.
+	 * 向模型客户端或服务器发送带参数的通知。
 	 *
 	 * <p>
-	 * Similar to {@link #sendNotification(String)} but allows sending additional
-	 * parameters with the notification.
+	 * 类似于{@link #sendNotification(String)}，但允许随通知发送额外的参数。
 	 * </p>
-	 * @param method the name of the notification method to be sent to the counterparty
-	 * @param params parameters to be sent with the notification
-	 * @return a Mono that completes when the notification has been sent
+	 * @param method 要发送给对方的通知方法的名称
+	 * @param params 要随通知一起发送的参数
+	 * @return 当通知发送完成时完成的Mono
 	 */
 	Mono<Void> sendNotification(String method, Object params);
 
 	/**
-	 * Closes the session and releases any associated resources asynchronously.
-	 * @return a {@link Mono<Void>} that completes when the session has been closed.
+	 * 异步关闭会话并释放任何相关资源。
+	 * @return 当会话关闭时完成的{@link Mono<Void>}。
 	 */
 	Mono<Void> closeGracefully();
 
 	/**
-	 * Closes the session and releases any associated resources.
+	 * 关闭会话并释放任何相关资源。
 	 */
 	void close();
 

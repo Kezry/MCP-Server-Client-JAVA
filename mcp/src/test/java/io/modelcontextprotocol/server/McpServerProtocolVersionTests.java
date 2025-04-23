@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for MCP server protocol version negotiation and compatibility.
+ * MCP服务器协议版本协商和兼容性测试。
  */
 class McpServerProtocolVersionTests {
 

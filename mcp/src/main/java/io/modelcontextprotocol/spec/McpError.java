@@ -1,6 +1,6 @@
 /*
-* Copyright 2024 - 2024 the original author or authors.
-*/
+ * Copyright 2024 - 2024 原始作者保留所有权利。
+ */
 package io.modelcontextprotocol.spec;
 
 import io.modelcontextprotocol.spec.McpSchema.JSONRPCResponse.JSONRPCError;

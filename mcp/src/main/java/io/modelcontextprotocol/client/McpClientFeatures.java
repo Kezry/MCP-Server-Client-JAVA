@@ -19,27 +19,26 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Representation of features and capabilities for Model Context Protocol (MCP) clients.
- * This class provides two record types for managing client features:
+ * 模型上下文协议(MCP)客户端的特性和能力的表示。
+ * 此类提供两种记录类型用于管理客户端特性：
  * <ul>
- * <li>{@link Async} for non-blocking operations with Project Reactor's Mono responses
- * <li>{@link Sync} for blocking operations with direct responses
+ * <li>{@link Async} 用于带有Project Reactor的Mono响应的非阻塞操作
+ * <li>{@link Sync} 用于带有直接响应的阻塞操作
  * </ul>
  *
  * <p>
- * Each feature specification includes:
+ * 每个特性规范包括：
  * <ul>
- * <li>Client implementation information and capabilities
- * <li>Root URI mappings for resource access
- * <li>Change notification handlers for tools, resources, and prompts
- * <li>Logging message consumers
- * <li>Message sampling handlers for request processing
+ * <li>客户端实现信息和能力
+ * <li>用于资源访问的根URI映射
+ * <li>用于工具、资源和提示的变更通知处理器
+ * <li>日志消息消费者
+ * <li>用于请求处理的消息采样处理器
  * </ul>
  *
  * <p>
- * The class supports conversion between synchronous and asynchronous specifications
- * through the {@link Async#fromSync} method, which ensures proper handling of blocking
- * operations in non-blocking contexts by scheduling them on a bounded elastic scheduler.
+ * 该类通过{@link Async#fromSync}方法支持同步和异步规范之间的转换，
+ * 通过在有界弹性调度器上调度来确保在非阻塞上下文中正确处理阻塞操作。
  *
  * @author Dariusz Jędrzejczyk
  * @see McpClient
@@ -49,17 +48,16 @@ import reactor.core.scheduler.Schedulers;
 class McpClientFeatures {
 
 	/**
-	 * Asynchronous client features specification providing the capabilities and request
-	 * and notification handlers.
+	 * 异步客户端特性规范，提供能力以及请求和通知处理器。
 	 *
-	 * @param clientInfo the client implementation information.
-	 * @param clientCapabilities the client capabilities.
-	 * @param roots the roots.
-	 * @param toolsChangeConsumers the tools change consumers.
-	 * @param resourcesChangeConsumers the resources change consumers.
-	 * @param promptsChangeConsumers the prompts change consumers.
-	 * @param loggingConsumers the logging consumers.
-	 * @param samplingHandler the sampling handler.
+	 * @param clientInfo 客户端实现信息。
+	 * @param clientCapabilities 客户端能力。
+	 * @param roots 根目录。
+	 * @param toolsChangeConsumers 工具变更消费者。
+	 * @param resourcesChangeConsumers 资源变更消费者。
+	 * @param promptsChangeConsumers 提示变更消费者。
+	 * @param loggingConsumers 日志消费者。
+	 * @param samplingHandler 采样处理器。
 	 */
 	record Async(McpSchema.Implementation clientInfo, McpSchema.ClientCapabilities clientCapabilities,
 			Map<String, McpSchema.Root> roots, List<Function<List<McpSchema.Tool>, Mono<Void>>> toolsChangeConsumers,
@@ -69,14 +67,14 @@ class McpClientFeatures {
 			Function<McpSchema.CreateMessageRequest, Mono<McpSchema.CreateMessageResult>> samplingHandler) {
 
 		/**
-		 * Create an instance and validate the arguments.
-		 * @param clientCapabilities the client capabilities.
-		 * @param roots the roots.
-		 * @param toolsChangeConsumers the tools change consumers.
-		 * @param resourcesChangeConsumers the resources change consumers.
-		 * @param promptsChangeConsumers the prompts change consumers.
-		 * @param loggingConsumers the logging consumers.
-		 * @param samplingHandler the sampling handler.
+		 * 创建实例并验证参数。
+		 * @param clientCapabilities 客户端能力。
+		 * @param roots 根目录。
+		 * @param toolsChangeConsumers 工具变更消费者。
+		 * @param resourcesChangeConsumers 资源变更消费者。
+		 * @param promptsChangeConsumers 提示变更消费者。
+		 * @param loggingConsumers 日志消费者。
+		 * @param samplingHandler 采样处理器。
 		 */
 		public Async(McpSchema.Implementation clientInfo, McpSchema.ClientCapabilities clientCapabilities,
 				Map<String, McpSchema.Root> roots,
@@ -102,12 +100,10 @@ class McpClientFeatures {
 		}
 
 		/**
-		 * Convert a synchronous specification into an asynchronous one and provide
-		 * blocking code offloading to prevent accidental blocking of the non-blocking
-		 * transport.
-		 * @param syncSpec a potentially blocking, synchronous specification.
-		 * @return a specification which is protected from blocking calls specified by the
-		 * user.
+		 * 将同步规范转换为异步规范，并提供阻塞代码卸载，
+		 * 以防止意外阻塞非阻塞传输。
+		 * @param syncSpec 可能阻塞的同步规范。
+		 * @return 受保护免受用户指定的阻塞调用影响的规范。
 		 */
 		public static Async fromSync(Sync syncSpec) {
 			List<Function<List<McpSchema.Tool>, Mono<Void>>> toolsChangeConsumers = new ArrayList<>();
@@ -145,17 +141,16 @@ class McpClientFeatures {
 	}
 
 	/**
-	 * Synchronous client features specification providing the capabilities and request
-	 * and notification handlers.
+	 * 同步客户端特性规范，提供能力以及请求和通知处理器。
 	 *
-	 * @param clientInfo the client implementation information.
-	 * @param clientCapabilities the client capabilities.
-	 * @param roots the roots.
-	 * @param toolsChangeConsumers the tools change consumers.
-	 * @param resourcesChangeConsumers the resources change consumers.
-	 * @param promptsChangeConsumers the prompts change consumers.
-	 * @param loggingConsumers the logging consumers.
-	 * @param samplingHandler the sampling handler.
+	 * @param clientInfo 客户端实现信息。
+	 * @param clientCapabilities 客户端能力。
+	 * @param roots 根目录。
+	 * @param toolsChangeConsumers 工具变更消费者。
+	 * @param resourcesChangeConsumers 资源变更消费者。
+	 * @param promptsChangeConsumers 提示变更消费者。
+	 * @param loggingConsumers 日志消费者。
+	 * @param samplingHandler 采样处理器。
 	 */
 	public record Sync(McpSchema.Implementation clientInfo, McpSchema.ClientCapabilities clientCapabilities,
 			Map<String, McpSchema.Root> roots, List<Consumer<List<McpSchema.Tool>>> toolsChangeConsumers,
@@ -165,15 +160,15 @@ class McpClientFeatures {
 			Function<McpSchema.CreateMessageRequest, McpSchema.CreateMessageResult> samplingHandler) {
 
 		/**
-		 * Create an instance and validate the arguments.
-		 * @param clientInfo the client implementation information.
-		 * @param clientCapabilities the client capabilities.
-		 * @param roots the roots.
-		 * @param toolsChangeConsumers the tools change consumers.
-		 * @param resourcesChangeConsumers the resources change consumers.
-		 * @param promptsChangeConsumers the prompts change consumers.
-		 * @param loggingConsumers the logging consumers.
-		 * @param samplingHandler the sampling handler.
+		 * 创建实例并验证参数。
+		 * @param clientInfo 客户端实现信息。
+		 * @param clientCapabilities 客户端能力。
+		 * @param roots 根目录。
+		 * @param toolsChangeConsumers 工具变更消费者。
+		 * @param resourcesChangeConsumers 资源变更消费者。
+		 * @param promptsChangeConsumers 提示变更消费者。
+		 * @param loggingConsumers 日志消费者。
+		 * @param samplingHandler 采样处理器。
 		 */
 		public Sync(McpSchema.Implementation clientInfo, McpSchema.ClientCapabilities clientCapabilities,
 				Map<String, McpSchema.Root> roots, List<Consumer<List<McpSchema.Tool>>> toolsChangeConsumers,

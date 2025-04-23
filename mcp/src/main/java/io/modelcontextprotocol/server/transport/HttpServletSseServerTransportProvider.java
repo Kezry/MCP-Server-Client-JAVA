@@ -31,26 +31,24 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A Servlet-based implementation of the MCP HTTP with Server-Sent Events (SSE) transport
- * specification. This implementation provides similar functionality to
- * WebFluxSseServerTransportProvider but uses the traditional Servlet API instead of
- * WebFlux.
+ * 基于Servlet的MCP HTTP和服务器发送事件(SSE)传输规范的实现。
+ * 该实现提供了与WebFluxSseServerTransportProvider类似的功能，
+ * 但使用传统的Servlet API而不是WebFlux。
  *
  * <p>
- * The transport handles two types of endpoints:
+ * 该传输处理两种类型的端点：
  * <ul>
- * <li>SSE endpoint (/sse) - Establishes a long-lived connection for server-to-client
- * events</li>
- * <li>Message endpoint (configurable) - Handles client-to-server message requests</li>
+ * <li>SSE端点(/sse) - 建立用于服务器到客户端事件的长连接</li>
+ * <li>消息端点(可配置) - 处理客户端到服务器的消息请求</li>
  * </ul>
  *
  * <p>
- * Features:
+ * 特性：
  * <ul>
- * <li>Asynchronous message handling using Servlet 6.0 async support</li>
- * <li>Session management for multiple client connections</li>
- * <li>Graceful shutdown support</li>
- * <li>Error handling and response formatting</li>
+ * <li>使用Servlet 6.0异步支持进行异步消息处理</li>
+ * <li>多客户端连接的会话管理</li>
+ * <li>支持优雅关闭</li>
+ * <li>错误处理和响应格式化</li>
  * </ul>
  *
  * @author Christian Tzolov
@@ -62,7 +60,7 @@ import reactor.core.publisher.Mono;
 @WebServlet(asyncSupported = true)
 public class HttpServletSseServerTransportProvider extends HttpServlet implements McpServerTransportProvider {
 
-	/** Logger for this class */
+	/** 该类的日志记录器 */
 	private static final Logger logger = LoggerFactory.getLogger(HttpServletSseServerTransportProvider.class);
 
 	public static final String UTF_8 = "UTF-8";
@@ -71,45 +69,43 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 
 	public static final String FAILED_TO_SEND_ERROR_RESPONSE = "Failed to send error response: {}";
 
-	/** Default endpoint path for SSE connections */
+	/** SSE连接的默认端点路径 */
 	public static final String DEFAULT_SSE_ENDPOINT = "/sse";
 
-	/** Event type for regular messages */
+	/** 常规消息的事件类型 */
 	public static final String MESSAGE_EVENT_TYPE = "message";
 
-	/** Event type for endpoint information */
+	/** 端点信息的事件类型 */
 	public static final String ENDPOINT_EVENT_TYPE = "endpoint";
 
 	public static final String DEFAULT_BASE_URL = "";
 
-	/** JSON object mapper for serialization/deserialization */
+	/** 用于序列化/反序列化的JSON对象映射器 */
 	private final ObjectMapper objectMapper;
 
-	/** Base URL for the server transport */
+	/** 服务器传输的基础URL */
 	private final String baseUrl;
 
-	/** The endpoint path for handling client messages */
+	/** 处理客户端消息的端点路径 */
 	private final String messageEndpoint;
 
-	/** The endpoint path for handling SSE connections */
+	/** 处理SSE连接的端点路径 */
 	private final String sseEndpoint;
 
-	/** Map of active client sessions, keyed by session ID */
+	/** 活动客户端会话的映射，以会话ID为键 */
 	private final Map<String, McpServerSession> sessions = new ConcurrentHashMap<>();
 
-	/** Flag indicating if the transport is in the process of shutting down */
+	/** 指示传输是否正在关闭的标志 */
 	private final AtomicBoolean isClosing = new AtomicBoolean(false);
 
-	/** Session factory for creating new sessions */
+	/** 用于创建新会话的会话工厂 */
 	private McpServerSession.Factory sessionFactory;
 
 	/**
-	 * Creates a new HttpServletSseServerTransportProvider instance with a custom SSE
-	 * endpoint.
-	 * @param objectMapper The JSON object mapper to use for message
-	 * serialization/deserialization
-	 * @param messageEndpoint The endpoint path where clients will send their messages
-	 * @param sseEndpoint The endpoint path where clients will establish SSE connections
+	 * 使用自定义SSE端点创建新的HttpServletSseServerTransportProvider实例。
+	 * @param objectMapper 用于消息序列化/反序列化的JSON对象映射器
+	 * @param messageEndpoint 客户端发送消息的端点路径
+	 * @param sseEndpoint 客户端建立SSE连接的端点路径
 	 */
 	public HttpServletSseServerTransportProvider(ObjectMapper objectMapper, String messageEndpoint,
 			String sseEndpoint) {
@@ -117,13 +113,11 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 	}
 
 	/**
-	 * Creates a new HttpServletSseServerTransportProvider instance with a custom SSE
-	 * endpoint.
-	 * @param objectMapper The JSON object mapper to use for message
-	 * serialization/deserialization
-	 * @param baseUrl The base URL for the server transport
-	 * @param messageEndpoint The endpoint path where clients will send their messages
-	 * @param sseEndpoint The endpoint path where clients will establish SSE connections
+	 * 使用自定义SSE端点创建新的HttpServletSseServerTransportProvider实例。
+	 * @param objectMapper 用于消息序列化/反序列化的JSON对象映射器
+	 * @param baseUrl 服务器传输的基础URL
+	 * @param messageEndpoint 客户端发送消息的端点路径
+	 * @param sseEndpoint 客户端建立SSE连接的端点路径
 	 */
 	public HttpServletSseServerTransportProvider(ObjectMapper objectMapper, String baseUrl, String messageEndpoint,
 			String sseEndpoint) {
@@ -134,11 +128,9 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 	}
 
 	/**
-	 * Creates a new HttpServletSseServerTransportProvider instance with the default SSE
-	 * endpoint.
-	 * @param objectMapper The JSON object mapper to use for message
-	 * serialization/deserialization
-	 * @param messageEndpoint The endpoint path where clients will send their messages
+	 * 使用默认SSE端点创建新的HttpServletSseServerTransportProvider实例。
+	 * @param objectMapper 用于消息序列化/反序列化的JSON对象映射器
+	 * @param messageEndpoint 客户端发送消息的端点路径
 	 */
 	public HttpServletSseServerTransportProvider(ObjectMapper objectMapper, String messageEndpoint) {
 		this(objectMapper, messageEndpoint, DEFAULT_SSE_ENDPOINT);
@@ -177,15 +169,14 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 	}
 
 	/**
-	 * Handles GET requests to establish SSE connections.
+	 * 处理建立SSE连接的GET请求。
 	 * <p>
-	 * This method sets up a new SSE connection when a client connects to the SSE
-	 * endpoint. It configures the response headers for SSE, creates a new session, and
-	 * sends the initial endpoint information to the client.
-	 * @param request The HTTP servlet request
-	 * @param response The HTTP servlet response
-	 * @throws ServletException If a servlet-specific error occurs
-	 * @throws IOException If an I/O error occurs
+	 * 当客户端连接到SSE端点时，此方法设置新的SSE连接。
+	 * 它配置SSE的响应头，创建新会话，并向客户端发送初始端点信息。
+	 * @param request HTTP servlet请求
+	 * @param response HTTP servlet响应
+	 * @throws ServletException 如果发生servlet特定错误
+	 * @throws IOException 如果发生I/O错误
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -214,28 +205,27 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 
 		PrintWriter writer = response.getWriter();
 
-		// Create a new session transport
+		// 创建新的会话传输
 		HttpServletMcpSessionTransport sessionTransport = new HttpServletMcpSessionTransport(sessionId, asyncContext,
 				writer);
 
-		// Create a new session using the session factory
+		// 使用会话工厂创建新会话
 		McpServerSession session = sessionFactory.create(sessionTransport);
 		this.sessions.put(sessionId, session);
 
-		// Send initial endpoint event
+		// 发送初始端点事件
 		this.sendEvent(writer, ENDPOINT_EVENT_TYPE, this.baseUrl + this.messageEndpoint + "?sessionId=" + sessionId);
 	}
 
 	/**
-	 * Handles POST requests for client messages.
+	 * 处理客户端消息的POST请求。
 	 * <p>
-	 * This method processes incoming messages from clients, routes them through the
-	 * session handler, and sends back the appropriate response. It handles error cases
-	 * and formats error responses according to the MCP specification.
-	 * @param request The HTTP servlet request
-	 * @param response The HTTP servlet response
-	 * @throws ServletException If a servlet-specific error occurs
-	 * @throws IOException If an I/O error occurs
+	 * 此方法处理来自客户端的传入消息，通过会话处理程序路由它们，
+	 * 并发送适当的响应。它处理错误情况，并根据MCP规范格式化错误响应。
+	 * @param request HTTP servlet请求
+	 * @param response HTTP servlet响应
+	 * @throws ServletException 如果发生servlet特定错误
+	 * @throws IOException 如果发生I/O错误
 	 */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -252,7 +242,7 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 			return;
 		}
 
-		// Get the session ID from the request parameter
+		// 从请求参数获取会话ID
 		String sessionId = request.getParameter("sessionId");
 		if (sessionId == null) {
 			response.setContentType(APPLICATION_JSON);
@@ -265,7 +255,7 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 			return;
 		}
 
-		// Get the session from the sessions map
+		// 从会话映射中获取会话
 		McpServerSession session = sessions.get(sessionId);
 		if (session == null) {
 			response.setContentType(APPLICATION_JSON);
@@ -288,8 +278,8 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 
 			McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(objectMapper, body.toString());
 
-			// Process the message through the session's handle method
-			session.handle(message).block(); // Block for Servlet compatibility
+			// 通过会话的handle方法处理消息
+			session.handle(message).block(); // 为Servlet兼容性而阻塞
 
 			response.setStatus(HttpServletResponse.SC_OK);
 		}
@@ -328,11 +318,11 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 	}
 
 	/**
-	 * Sends an SSE event to a client.
-	 * @param writer The writer to send the event through
-	 * @param eventType The type of event (message or endpoint)
-	 * @param data The event data
-	 * @throws IOException If an error occurs while writing the event
+	 * 向客户端发送SSE事件。
+	 * @param writer 用于发送事件的写入器
+	 * @param eventType 事件类型（消息或端点）
+	 * @param data 事件数据
+	 * @throws IOException 如果在写入事件时发生错误
 	 */
 	private void sendEvent(PrintWriter writer, String eventType, String data) throws IOException {
 		writer.write("event: " + eventType + "\n");
@@ -345,10 +335,10 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 	}
 
 	/**
-	 * Cleans up resources when the servlet is being destroyed.
+	 * 在servlet被销毁时清理资源。
 	 * <p>
-	 * This method ensures a graceful shutdown by closing all client connections before
-	 * calling the parent's destroy method.
+	 * 此方法通过在调用父类的destroy方法之前关闭所有客户端连接
+	 * 来确保优雅关闭。
 	 */
 	@Override
 	public void destroy() {
@@ -357,8 +347,8 @@ public class HttpServletSseServerTransportProvider extends HttpServlet implement
 	}
 
 	/**
-	 * Implementation of McpServerTransport for HttpServlet SSE sessions. This class
-	 * handles the transport-level communication for a specific client session.
+	 * HttpServlet SSE会话的McpServerTransport实现。
+	 * 此类处理特定客户端会话的传输层通信。
 	 */
 	private class HttpServletMcpSessionTransport implements McpServerTransport {
 

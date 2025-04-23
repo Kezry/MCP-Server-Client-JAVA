@@ -1,4 +1,4 @@
-# WebMVC SSE Server Transport
+# WebMVC SSE服务器传输
 
 ```xml
 <dependency>

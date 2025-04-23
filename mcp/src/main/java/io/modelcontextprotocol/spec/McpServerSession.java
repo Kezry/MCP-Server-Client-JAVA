@@ -16,8 +16,7 @@ import reactor.core.publisher.MonoSink;
 import reactor.core.publisher.Sinks;
 
 /**
- * Represents a Model Control Protocol (MCP) session on the server side. It manages
- * bidirectional JSON-RPC communication with the client.
+ * 表示服务器端的模型控制协议(MCP)会话。它管理与客户端的双向JSON-RPC通信。
  */
 public class McpServerSession implements McpSession {
 
@@ -27,7 +26,7 @@ public class McpServerSession implements McpSession {
 
 	private final String id;
 
-	/** Duration to wait for request responses before timing out */
+	/** 等待请求响应超时的持续时间 */
 	private final Duration requestTimeout;
 
 	private final AtomicLong requestCounter = new AtomicLong(0);
@@ -57,16 +56,15 @@ public class McpServerSession implements McpSession {
 	private final AtomicInteger state = new AtomicInteger(STATE_UNINITIALIZED);
 
 	/**
-	 * Creates a new server session with the given parameters and the transport to use.
-	 * @param id session id
-	 * @param transport the transport to use
-	 * @param initHandler called when a
-	 * {@link io.modelcontextprotocol.spec.McpSchema.InitializeRequest} is received by the
-	 * server
-	 * @param initNotificationHandler called when a
-	 * {@link McpSchema.METHOD_NOTIFICATION_INITIALIZED} is received.
-	 * @param requestHandlers map of request handlers to use
-	 * @param notificationHandlers map of notification handlers to use
+	 * 使用给定的参数和传输创建新的服务器会话。
+	 * @param id 会话ID
+	 * @param transport 要使用的传输
+	 * @param initHandler 当服务器收到
+	 * {@link io.modelcontextprotocol.spec.McpSchema.InitializeRequest} 时调用
+	 * @param initNotificationHandler 当收到
+	 * {@link McpSchema.METHOD_NOTIFICATION_INITIALIZED} 时调用
+	 * @param requestHandlers 要使用的请求处理器映射
+	 * @param notificationHandlers 要使用的通知处理器映射
 	 */
 	public McpServerSession(String id, Duration requestTimeout, McpServerTransport transport,
 			InitRequestHandler initHandler, InitNotificationHandler initNotificationHandler,
@@ -81,22 +79,21 @@ public class McpServerSession implements McpSession {
 	}
 
 	/**
-	 * Retrieve the session id.
-	 * @return session id
+	 * 获取会话ID。
+	 * @return 会话ID
 	 */
 	public String getId() {
 		return this.id;
 	}
 
 	/**
-	 * Called upon successful initialization sequence between the client and the server
-	 * with the client capabilities and information.
+	 * 在客户端和服务器之间的初始化序列成功完成时调用，包含客户端的功能和信息。
 	 *
 	 * <a href=
-	 * "https://github.com/modelcontextprotocol/specification/blob/main/docs/specification/basic/lifecycle.md#initialization">Initialization
-	 * Spec</a>
-	 * @param clientCapabilities the capabilities the connected client provides
-	 * @param clientInfo the information about the connected client
+	 * "https://github.com/modelcontextprotocol/specification/blob/main/docs/specification/basic/lifecycle.md#initialization">初始化
+	 * 规范</a>
+	 * @param clientCapabilities 已连接客户端提供的功能
+	 * @param clientInfo 关于已连接客户端的信息
 	 */
 	public void init(McpSchema.ClientCapabilities clientCapabilities, McpSchema.Implementation clientInfo) {
 		this.clientCapabilities.lazySet(clientCapabilities);
@@ -143,14 +140,13 @@ public class McpServerSession implements McpSession {
 	}
 
 	/**
-	 * Called by the {@link McpServerTransportProvider} once the session is determined.
-	 * The purpose of this method is to dispatch the message to an appropriate handler as
-	 * specified by the MCP server implementation
-	 * ({@link io.modelcontextprotocol.server.McpAsyncServer} or
-	 * {@link io.modelcontextprotocol.server.McpSyncServer}) via
-	 * {@link McpServerSession.Factory} that the server creates.
-	 * @param message the incoming JSON-RPC message
-	 * @return a Mono that completes when the message is processed
+	 * 当会话确定后由{@link McpServerTransportProvider}调用。
+	 * 此方法的目的是将消息分发给适当的处理器，这些处理器由MCP服务器实现
+	 * ({@link io.modelcontextprotocol.server.McpAsyncServer}或
+	 * {@link io.modelcontextprotocol.server.McpSyncServer})通过
+	 * 服务器创建的{@link McpServerSession.Factory}指定。
+	 * @param message 传入的JSON-RPC消息
+	 * @return 当消息处理完成时完成的Mono
 	 */
 	public Mono<Void> handle(McpSchema.JSONRPCMessage message) {
 		return Mono.defer(() -> {
@@ -193,9 +189,9 @@ public class McpServerSession implements McpSession {
 	}
 
 	/**
-	 * Handles an incoming JSON-RPC request by routing it to the appropriate handler.
-	 * @param request The incoming JSON-RPC request
-	 * @return A Mono containing the JSON-RPC response
+	 * 通过路由到适当的处理器来处理传入的JSON-RPC请求。
+	 * @param request 传入的JSON-RPC请求
+	 * @return 包含JSON-RPC响应的Mono
 	 */
 	private Mono<McpSchema.JSONRPCResponse> handleIncomingRequest(McpSchema.JSONRPCRequest request) {
 		return Mono.defer(() -> {
@@ -233,9 +229,9 @@ public class McpServerSession implements McpSession {
 	}
 
 	/**
-	 * Handles an incoming JSON-RPC notification by routing it to the appropriate handler.
-	 * @param notification The incoming JSON-RPC notification
-	 * @return A Mono that completes when the notification is processed
+	 * 通过路由到适当的处理器来处理传入的JSON-RPC通知。
+	 * @param notification 传入的JSON-RPC通知
+	 * @return 当通知处理完成时完成的Mono
 	 */
 	private Mono<Void> handleIncomingNotification(McpSchema.JSONRPCNotification notification) {
 		return Mono.defer(() -> {
@@ -272,78 +268,74 @@ public class McpServerSession implements McpSession {
 	}
 
 	/**
-	 * Request handler for the initialization request.
+	 * 初始化请求的请求处理器。
 	 */
 	public interface InitRequestHandler {
 
 		/**
-		 * Handles the initialization request.
-		 * @param initializeRequest the initialization request by the client
-		 * @return a Mono that will emit the result of the initialization
+		 * 处理初始化请求。
+		 * @param initializeRequest 客户端的初始化请求
+		 * @return 将发出初始化结果的Mono
 		 */
 		Mono<McpSchema.InitializeResult> handle(McpSchema.InitializeRequest initializeRequest);
 
 	}
 
 	/**
-	 * Notification handler for the initialization notification from the client.
+	 * 客户端初始化通知的通知处理器。
 	 */
 	public interface InitNotificationHandler {
 
 		/**
-		 * Specifies an action to take upon successful initialization.
-		 * @return a Mono that will complete when the initialization is acted upon.
+		 * 指定初始化成功时要采取的操作。
+		 * @return 当初始化操作完成时完成的Mono。
 		 */
 		Mono<Void> handle();
 
 	}
 
 	/**
-	 * A handler for client-initiated notifications.
+	 * 客户端发起的通知的处理器。
 	 */
 	public interface NotificationHandler {
 
 		/**
-		 * Handles a notification from the client.
-		 * @param exchange the exchange associated with the client that allows calling
-		 * back to the connected client or inspecting its capabilities.
-		 * @param params the parameters of the notification.
-		 * @return a Mono that completes once the notification is handled.
+		 * 处理来自客户端的通知。
+		 * @param exchange 与客户端关联的交换对象，允许回调已连接的客户端或检查其功能。
+		 * @param params 通知的参数。
+		 * @return 当通知处理完成时完成的Mono。
 		 */
 		Mono<Void> handle(McpAsyncServerExchange exchange, Object params);
 
 	}
 
 	/**
-	 * A handler for client-initiated requests.
+	 * 客户端发起的请求的处理器。
 	 *
-	 * @param <T> the type of the response that is expected as a result of handling the
-	 * request.
+	 * @param <T> 处理请求后预期的响应类型。
 	 */
 	public interface RequestHandler<T> {
 
 		/**
-		 * Handles a request from the client.
-		 * @param exchange the exchange associated with the client that allows calling
-		 * back to the connected client or inspecting its capabilities.
-		 * @param params the parameters of the request.
-		 * @return a Mono that will emit the response to the request.
+		 * 处理来自客户端的请求。
+		 * @param exchange 与客户端关联的交换对象，允许回调已连接的客户端或检查其功能。
+		 * @param params 请求的参数。
+		 * @return 将发出请求响应的Mono。
 		 */
 		Mono<T> handle(McpAsyncServerExchange exchange, Object params);
 
 	}
 
 	/**
-	 * Factory for creating server sessions which delegate to a provided 1:1 transport
-	 * with a connected client.
+	 * 用于创建服务器会话的工厂，这些会话委托给与已连接客户端的1:1传输。
 	 */
 	@FunctionalInterface
 	public interface Factory {
 
 		/**
-		 * Creates a new 1:1 representation of the client-server interaction.
-		 * @param sessionTransport the transport to use for communication with the client.
-		 * @return a new server session.
+		 * 创建客户端-服务器交互的新的1:1表示。
+		 * @param sessionTransport 用于与客户端通信的传输。
+		 * @return 一个新的服务器会话。
 		 */
 		McpServerSession create(McpServerTransport sessionTransport);
 

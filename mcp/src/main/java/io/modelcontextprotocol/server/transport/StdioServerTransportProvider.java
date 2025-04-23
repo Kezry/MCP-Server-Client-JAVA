@@ -34,9 +34,9 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Implementation of the MCP Stdio transport provider for servers that communicates using
- * standard input/output streams. Messages are exchanged as newline-delimited JSON-RPC
- * messages over stdin/stdout, with errors and debug information sent to stderr.
+ * MCP Stdio传输提供者的服务器端实现，使用标准输入/输出流进行通信。
+ * 消息以换行符分隔的JSON-RPC格式通过stdin/stdout交换，
+ * 错误和调试信息通过stderr发送。
  *
  * @author Christian Tzolov
  */
@@ -57,28 +57,25 @@ public class StdioServerTransportProvider implements McpServerTransportProvider 
 	private final Sinks.One<Void> inboundReady = Sinks.one();
 
 	/**
-	 * Creates a new StdioServerTransportProvider with a default ObjectMapper and System
-	 * streams.
+	 * 使用默认ObjectMapper和系统流创建新的StdioServerTransportProvider。
 	 */
 	public StdioServerTransportProvider() {
 		this(new ObjectMapper());
 	}
 
 	/**
-	 * Creates a new StdioServerTransportProvider with the specified ObjectMapper and
-	 * System streams.
-	 * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
+	 * 使用指定的ObjectMapper和系统流创建新的StdioServerTransportProvider。
+	 * @param objectMapper 用于JSON序列化/反序列化的ObjectMapper
 	 */
 	public StdioServerTransportProvider(ObjectMapper objectMapper) {
 		this(objectMapper, System.in, System.out);
 	}
 
 	/**
-	 * Creates a new StdioServerTransportProvider with the specified ObjectMapper and
-	 * streams.
-	 * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
-	 * @param inputStream The input stream to read from
-	 * @param outputStream The output stream to write to
+	 * 使用指定的ObjectMapper和流创建新的StdioServerTransportProvider。
+	 * @param objectMapper 用于JSON序列化/反序列化的ObjectMapper
+	 * @param inputStream 用于读取的输入流
+	 * @param outputStream 用于写入的输出流
 	 */
 	public StdioServerTransportProvider(ObjectMapper objectMapper, InputStream inputStream, OutputStream outputStream) {
 		Assert.notNull(objectMapper, "The ObjectMapper can not be null");

@@ -1,16 +1,16 @@
 ---
 name: Miscellaneous
-about: Suggest an improvement for this project
+about: 为这个项目提出改进建议
 title: ''
 labels: 'status: waiting-for-triage'
 assignees: ''
 
 ---
 
-For anything other than bug reports and feature requests (performance, refactoring, etc),
-just go ahead and file the issue. Please provide as many details as possible.
+对于除了bug报告和功能请求之外的其他内容（性能、重构等），
+请直接提交issue。请提供尽可能多的详细信息。
 
-If you have a question or a support request, please open a new discussion on [GitHub Discussions](https://github.com/modelcontextprotocol/java-sdk/discussions)
+如果您有问题或需要支持，请在[GitHub Discussions](https://github.com/modelcontextprotocol/java-sdk/discussions)上开启新的讨论
 
-Please do **not** create issues on the [Issue Tracker](https://github.com/modelcontextprotocol/java-sdk/issues) for questions or support requests.
-We would like to keep the issue tracker **exclusively** for bug reports and feature requests.
+请**不要**在[Issue Tracker](https://github.com/modelcontextprotocol/java-sdk/issues)上创建问题或支持请求。
+我们希望将issue tracker**专门**用于bug报告和功能请求。

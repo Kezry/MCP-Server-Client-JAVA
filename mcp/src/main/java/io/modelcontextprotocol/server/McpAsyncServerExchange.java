@@ -14,8 +14,8 @@ import io.modelcontextprotocol.util.Assert;
 import reactor.core.publisher.Mono;
 
 /**
- * Represents an asynchronous exchange with a Model Context Protocol (MCP) client. The
- * exchange provides methods to interact with the client and query its capabilities.
+ * 表示与模型上下文协议(MCP)客户端的异步交互。该交互提供了与客户端交互
+ * 并查询其能力的方法。
  *
  * @author Dariusz Jędrzejczyk
  * @author Christian Tzolov
@@ -37,11 +37,10 @@ public class McpAsyncServerExchange {
 	};
 
 	/**
-	 * Create a new asynchronous exchange with the client.
-	 * @param session The server session representing a 1-1 interaction.
-	 * @param clientCapabilities The client capabilities that define the supported
-	 * features and functionality.
-	 * @param clientInfo The client implementation information.
+	 * 创建与客户端的新异步交互。
+	 * @param session 表示1-1交互的服务器会话。
+	 * @param clientCapabilities 定义支持的特性和功能的客户端能力。
+	 * @param clientInfo 客户端实现信息。
 	 */
 	public McpAsyncServerExchange(McpServerSession session, McpSchema.ClientCapabilities clientCapabilities,
 			McpSchema.Implementation clientInfo) {
@@ -51,38 +50,36 @@ public class McpAsyncServerExchange {
 	}
 
 	/**
-	 * Get the client capabilities that define the supported features and functionality.
-	 * @return The client capabilities
+	 * 获取定义支持的特性和功能的客户端能力。
+	 * @return 客户端能力
 	 */
 	public McpSchema.ClientCapabilities getClientCapabilities() {
 		return this.clientCapabilities;
 	}
 
 	/**
-	 * Get the client implementation information.
-	 * @return The client implementation details
+	 * 获取客户端实现信息。
+	 * @return 客户端实现详情
 	 */
 	public McpSchema.Implementation getClientInfo() {
 		return this.clientInfo;
 	}
 
 	/**
-	 * Create a new message using the sampling capabilities of the client. The Model
-	 * Context Protocol (MCP) provides a standardized way for servers to request LLM
-	 * sampling (“completions” or “generations”) from language models via clients. This
-	 * flow allows clients to maintain control over model access, selection, and
-	 * permissions while enabling servers to leverage AI capabilities—with no server API
-	 * keys necessary. Servers can request text or image-based interactions and optionally
-	 * include context from MCP servers in their prompts.
-	 * @param createMessageRequest The request to create a new message
-	 * @return A Mono that completes when the message has been created
+	 * 使用客户端的采样功能创建新消息。模型上下文协议(MCP)为服务器提供了一种标准化的方式，
+	 * 通过客户端从语言模型请求LLM采样("completions"或"generations")。这个流程允许客户端
+	 * 保持对模型访问、选择和权限的控制，同时使服务器能够利用AI功能 - 无需服务器API密钥。
+	 * 服务器可以请求基于文本或图像的交互，并可以选择在其提示中包含来自MCP服务器的上下文。
+	 * @param createMessageRequest 创建新消息的请求
+	 * @return 当消息创建完成时完成的Mono
 	 * @see McpSchema.CreateMessageRequest
 	 * @see McpSchema.CreateMessageResult
 	 * @see <a href=
-	 * "https://spec.modelcontextprotocol.io/specification/client/sampling/">Sampling
-	 * Specification</a>
+	 * "https://spec.modelcontextprotocol.io/specification/client/sampling/">采样
+	 * 规范</a>
 	 */
 	public Mono<McpSchema.CreateMessageResult> createMessage(McpSchema.CreateMessageRequest createMessageRequest) {
+
 		if (this.clientCapabilities == null) {
 			return Mono.error(new McpError("Client must be initialized. Call the initialize method first!"));
 		}
@@ -94,17 +91,17 @@ public class McpAsyncServerExchange {
 	}
 
 	/**
-	 * Retrieves the list of all roots provided by the client.
-	 * @return A Mono that emits the list of roots result.
+	 * 获取客户端提供的所有根目录列表。
+	 * @return 发出根目录列表结果的Mono。
 	 */
 	public Mono<McpSchema.ListRootsResult> listRoots() {
 		return this.listRoots(null);
 	}
 
 	/**
-	 * Retrieves a paginated list of roots provided by the client.
-	 * @param cursor Optional pagination cursor from a previous list request
-	 * @return A Mono that emits the list of roots result containing
+	 * 获取客户端提供的分页根目录列表。
+	 * @param cursor 来自前一个列表请求的可选分页游标
+	 * @return 发出包含根目录列表结果的Mono
 	 */
 	public Mono<McpSchema.ListRootsResult> listRoots(String cursor) {
 		return this.session.sendRequest(McpSchema.METHOD_ROOTS_LIST, new McpSchema.PaginatedRequest(cursor),
@@ -112,10 +109,9 @@ public class McpAsyncServerExchange {
 	}
 
 	/**
-	 * Send a logging message notification to all connected clients. Messages below the
-	 * current minimum logging level will be filtered out.
-	 * @param loggingMessageNotification The logging message to send
-	 * @return A Mono that completes when the notification has been sent
+	 * 向所有已连接的客户端发送日志消息通知。低于当前最小日志级别的消息将被过滤掉。
+	 * @param loggingMessageNotification 要发送的日志消息
+	 * @return 当通知发送完成时完成的Mono
 	 */
 	public Mono<Void> loggingNotification(LoggingMessageNotification loggingMessageNotification) {
 
@@ -132,9 +128,8 @@ public class McpAsyncServerExchange {
 	}
 
 	/**
-	 * Set the minimum logging level for the client. Messages below this level will be
-	 * filtered out.
-	 * @param minLoggingLevel The minimum logging level
+	 * 设置客户端的最小日志级别。低于此级别的消息将被过滤掉。
+	 * @param minLoggingLevel 最小日志级别
 	 */
 	void setMinLoggingLevel(LoggingLevel minLoggingLevel) {
 		Assert.notNull(minLoggingLevel, "minLoggingLevel must not be null");

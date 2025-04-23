@@ -14,22 +14,19 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
- * A Server-Sent Events (SSE) client implementation using Java's Flow API for reactive
- * stream processing. This client establishes a connection to an SSE endpoint and
- * processes the incoming event stream, parsing SSE-formatted messages into structured
- * events.
+ * 使用Java的Flow API实现的服务器发送事件(SSE)客户端，用于响应式流处理。
+ * 该客户端建立与SSE端点的连接，并处理传入的事件流，将SSE格式的消息解析为结构化事件。
  *
  * <p>
- * The client supports standard SSE event fields including:
+ * 客户端支持标准的SSE事件字段，包括：
  * <ul>
- * <li>event - The event type (defaults to "message" if not specified)</li>
- * <li>id - The event ID</li>
- * <li>data - The event payload data</li>
+ * <li>event - 事件类型（如果未指定，默认为"message"）</li>
+ * <li>id - 事件ID</li>
+ * <li>data - 事件负载数据</li>
  * </ul>
  *
  * <p>
- * Events are delivered to a provided {@link SseEventHandler} which can process events and
- * handle any errors that occur during the connection.
+ * 事件将被传递给提供的{@link SseEventHandler}，用于处理事件和连接过程中发生的任何错误。
  *
  * @author Christian Tzolov
  * @see SseEventHandler
@@ -42,65 +39,61 @@ public class FlowSseClient {
 	private final HttpRequest.Builder requestBuilder;
 
 	/**
-	 * Pattern to extract the data content from SSE data field lines. Matches lines
-	 * starting with "data:" and captures the remaining content.
+	 * 用于从SSE数据字段行中提取数据内容的模式。匹配以"data:"开头的行并捕获剩余内容。
 	 */
 	private static final Pattern EVENT_DATA_PATTERN = Pattern.compile("^data:(.+)$", Pattern.MULTILINE);
 
 	/**
-	 * Pattern to extract the event ID from SSE id field lines. Matches lines starting
-	 * with "id:" and captures the ID value.
+	 * 用于从SSE id字段行中提取事件ID的模式。匹配以"id:"开头的行并捕获ID值。
 	 */
 	private static final Pattern EVENT_ID_PATTERN = Pattern.compile("^id:(.+)$", Pattern.MULTILINE);
 
 	/**
-	 * Pattern to extract the event type from SSE event field lines. Matches lines
-	 * starting with "event:" and captures the event type.
+	 * 用于从SSE事件字段行中提取事件类型的模式。匹配以"event:"开头的行并捕获事件类型。
 	 */
 	private static final Pattern EVENT_TYPE_PATTERN = Pattern.compile("^event:(.+)$", Pattern.MULTILINE);
 
 	/**
-	 * Record class representing a Server-Sent Event with its standard fields.
+	 * 表示具有标准字段的服务器发送事件的记录类。
 	 *
-	 * @param id the event ID (may be null)
-	 * @param type the event type (defaults to "message" if not specified in the stream)
-	 * @param data the event payload data
+	 * @param id 事件ID（可能为null）
+	 * @param type 事件类型（如果在流中未指定，则默认为"message"）
+	 * @param data 事件负载数据
 	 */
 	public static record SseEvent(String id, String type, String data) {
 	}
 
 	/**
-	 * Interface for handling SSE events and errors. Implementations can process received
-	 * events and handle any errors that occur during the SSE connection.
+	 * 用于处理SSE事件和错误的接口。实现类可以处理接收到的事件和SSE连接期间发生的任何错误。
 	 */
 	public interface SseEventHandler {
 
 		/**
-		 * Called when an SSE event is received.
-		 * @param event the received SSE event containing id, type, and data
+		 * 当接收到SSE事件时调用。
+		 * @param event 包含id、type和data的接收到的SSE事件
 		 */
 		void onEvent(SseEvent event);
 
 		/**
-		 * Called when an error occurs during the SSE connection.
-		 * @param error the error that occurred
+		 * 当SSE连接期间发生错误时调用。
+		 * @param error 发生的错误
 		 */
 		void onError(Throwable error);
 
 	}
 
 	/**
-	 * Creates a new FlowSseClient with the specified HTTP client.
-	 * @param httpClient the {@link HttpClient} instance to use for SSE connections
+	 * 使用指定的HTTP客户端创建新的FlowSseClient。
+	 * @param httpClient 用于SSE连接的{@link HttpClient}实例
 	 */
 	public FlowSseClient(HttpClient httpClient) {
 		this(httpClient, HttpRequest.newBuilder());
 	}
 
 	/**
-	 * Creates a new FlowSseClient with the specified HTTP client and request builder.
-	 * @param httpClient the {@link HttpClient} instance to use for SSE connections
-	 * @param requestBuilder the {@link HttpRequest.Builder} to use for SSE requests
+	 * 使用指定的HTTP客户端和请求构建器创建新的FlowSseClient。
+	 * @param httpClient 用于SSE连接的{@link HttpClient}实例
+	 * @param requestBuilder 用于SSE请求的{@link HttpRequest.Builder}
 	 */
 	public FlowSseClient(HttpClient httpClient, HttpRequest.Builder requestBuilder) {
 		this.httpClient = httpClient;
@@ -108,17 +101,14 @@ public class FlowSseClient {
 	}
 
 	/**
-	 * Subscribes to an SSE endpoint and processes the event stream.
+	 * 订阅SSE端点并处理事件流。
 	 *
 	 * <p>
-	 * This method establishes a connection to the specified URL and begins processing the
-	 * SSE stream. Events are parsed and delivered to the provided event handler. The
-	 * connection remains active until either an error occurs or the server closes the
-	 * connection.
-	 * @param url the SSE endpoint URL to connect to
-	 * @param eventHandler the handler that will receive SSE events and error
-	 * notifications
-	 * @throws RuntimeException if the connection fails with a non-200 status code
+	 * 此方法建立与指定URL的连接并开始处理SSE流。事件被解析并传递给提供的事件处理器。
+	 * 连接保持活动状态，直到发生错误或服务器关闭连接。
+	 * @param url 要连接的SSE端点URL
+	 * @param eventHandler 接收SSE事件和错误通知的处理器
+	 * @throws RuntimeException 如果连接失败且状态码不是200
 	 */
 	public void subscribe(String url, SseEventHandler eventHandler) {
 		HttpRequest request = this.requestBuilder.uri(URI.create(url))
@@ -143,7 +133,7 @@ public class FlowSseClient {
 			@Override
 			public void onNext(String line) {
 				if (line.isEmpty()) {
-					// Empty line means end of event
+					// 空行表示事件结束
 					if (eventBuilder.length() > 0) {
 						String eventData = eventBuilder.toString();
 						SseEvent event = new SseEvent(currentEventId.get(), currentEventType.get(), eventData.trim());
@@ -181,7 +171,7 @@ public class FlowSseClient {
 
 			@Override
 			public void onComplete() {
-				// Handle any remaining event data
+				// 处理任何剩余的事件数据
 				if (eventBuilder.length() > 0) {
 					String eventData = eventBuilder.toString();
 					SseEvent event = new SseEvent(currentEventId.get(), currentEventType.get(), eventData.trim());

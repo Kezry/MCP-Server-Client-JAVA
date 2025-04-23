@@ -30,9 +30,9 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Implementation of the MCP Stdio transport that communicates with a server process using
- * standard input/output streams. Messages are exchanged as newline-delimited JSON-RPC
- * messages over stdin/stdout, with errors and debug information sent to stderr.
+ * MCP Stdio传输的实现，使用标准输入/输出流与服务器进程通信。
+ * 消息以换行符分隔的JSON-RPC格式通过stdin/stdout交换，
+ * 错误和调试信息通过stderr发送。
  *
  * @author Christian Tzolov
  * @author Dariusz Jędrzejczyk
@@ -45,21 +45,21 @@ public class StdioClientTransport implements McpClientTransport {
 
 	private final Sinks.Many<JSONRPCMessage> outboundSink;
 
-	/** The server process being communicated with */
+	/** 正在通信的服务器进程 */
 	private Process process;
 
 	private ObjectMapper objectMapper;
 
-	/** Scheduler for handling inbound messages from the server process */
+	/** 用于处理来自服务器进程的入站消息的调度器 */
 	private Scheduler inboundScheduler;
 
-	/** Scheduler for handling outbound messages to the server process */
+	/** 用于处理发送到服务器进程的出站消息的调度器 */
 	private Scheduler outboundScheduler;
 
-	/** Scheduler for handling error messages from the server process */
+	/** 用于处理来自服务器进程的错误消息的调度器 */
 	private Scheduler errorScheduler;
 
-	/** Parameters for configuring and starting the server process */
+	/** 用于配置和启动服务器进程的参数 */
 	private final ServerParameters params;
 
 	private final Sinks.Many<String> errorSink;
@@ -70,18 +70,17 @@ public class StdioClientTransport implements McpClientTransport {
 	private Consumer<String> stdErrorHandler = error -> logger.info("STDERR Message received: {}", error);
 
 	/**
-	 * Creates a new StdioClientTransport with the specified parameters and default
-	 * ObjectMapper.
-	 * @param params The parameters for configuring the server process
+	 * 使用指定参数和默认ObjectMapper创建新的StdioClientTransport。
+	 * @param params 用于配置服务器进程的参数
 	 */
 	public StdioClientTransport(ServerParameters params) {
 		this(params, new ObjectMapper());
 	}
 
 	/**
-	 * Creates a new StdioClientTransport with the specified parameters and ObjectMapper.
-	 * @param params The parameters for configuring the server process
-	 * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
+	 * 使用指定参数和ObjectMapper创建新的StdioClientTransport。
+	 * @param params 用于配置服务器进程的参数
+	 * @param objectMapper 用于JSON序列化/反序列化的ObjectMapper
 	 */
 	public StdioClientTransport(ServerParameters params, ObjectMapper objectMapper) {
 		Assert.notNull(params, "The params can not be null");
@@ -103,11 +102,9 @@ public class StdioClientTransport implements McpClientTransport {
 	}
 
 	/**
-	 * Starts the server process and initializes the message processing streams. This
-	 * method sets up the process with the configured command, arguments, and environment,
-	 * then starts the inbound, outbound, and error processing threads.
-	 * @throws RuntimeException if the process fails to start or if the process streams
-	 * are null
+	 * 启动服务器进程并初始化消息处理流。此方法使用配置的命令、参数和环境
+	 * 设置进程，然后启动入站、出站和错误处理线程。
+	 * @throws RuntimeException 如果进程启动失败或进程流为空
 	 */
 	@Override
 	public Mono<Void> connect(Function<Mono<JSONRPCMessage>, Mono<JSONRPCMessage>> handler) {
@@ -146,30 +143,29 @@ public class StdioClientTransport implements McpClientTransport {
 	}
 
 	/**
-	 * Creates and returns a new ProcessBuilder instance. Protected to allow overriding in
-	 * tests.
-	 * @return A new ProcessBuilder instance
+	 * 创建并返回一个新的ProcessBuilder实例。受保护以允许在测试中重写。
+	 * @return 一个新的ProcessBuilder实例
 	 */
 	protected ProcessBuilder getProcessBuilder() {
 		return new ProcessBuilder();
 	}
 
 	/**
-	 * Sets the handler for processing transport-level errors.
+	 * 设置用于处理传输层错误的处理器。
 	 *
 	 * <p>
-	 * The provided handler will be called when errors occur during transport operations,
-	 * such as connection failures or protocol violations.
+	 * 当传输操作期间发生错误时（如连接失败或协议违规），
+	 * 将调用提供的处理器。
 	 * </p>
-	 * @param errorHandler a consumer that processes error messages
+	 * @param errorHandler 处理错误消息的消费者
 	 */
 	public void setStdErrorHandler(Consumer<String> errorHandler) {
 		this.stdErrorHandler = errorHandler;
 	}
 
 	/**
-	 * Waits for the server process to exit.
-	 * @throws RuntimeException if the process is interrupted while waiting
+	 * 等待服务器进程退出。
+	 * @throws RuntimeException 如果等待过程中进程被中断
 	 */
 	public void awaitForExit() {
 		try {
@@ -181,8 +177,8 @@ public class StdioClientTransport implements McpClientTransport {
 	}
 
 	/**
-	 * Starts the error processing thread that reads from the process's error stream.
-	 * Error messages are logged and emitted to the error sink.
+	 * 启动从进程错误流读取的错误处理线程。
+	 * 错误消息被记录并发送到错误接收器。
 	 */
 	private void startErrorProcessing() {
 		this.errorScheduler.schedule(() -> {
@@ -248,8 +244,8 @@ public class StdioClientTransport implements McpClientTransport {
 	}
 
 	/**
-	 * Starts the inbound processing thread that reads JSON-RPC messages from the
-	 * process's input stream. Messages are deserialized and emitted to the inbound sink.
+	 * 启动从进程输入流读取JSON-RPC消息的入站处理线程。
+	 * 消息被反序列化并发送到入站接收器。
 	 */
 	private void startInboundProcessing() {
 		this.inboundScheduler.schedule(() -> {
@@ -286,9 +282,8 @@ public class StdioClientTransport implements McpClientTransport {
 	}
 
 	/**
-	 * Starts the outbound processing thread that writes JSON-RPC messages to the
-	 * process's output stream. Messages are serialized to JSON and written with a newline
-	 * delimiter.
+	 * 启动将JSON-RPC消息写入进程输出流的出站处理线程。
+	 * 消息被序列化为JSON并以换行符作为分隔符写入。
 	 */
 	private void startOutboundProcessing() {
 		this.handleOutbound(messages -> messages

@@ -16,33 +16,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A synchronous client implementation for the Model Context Protocol (MCP) that wraps an
- * {@link McpAsyncClient} to provide blocking operations.
+ * 模型上下文协议(MCP)的同步客户端实现，它封装了一个{@link McpAsyncClient}来提供阻塞操作。
  *
  * <p>
- * This client implements the MCP specification by delegating to an asynchronous client
- * and blocking on the results. Key features include:
+ * 该客户端通过委托给异步客户端并在结果上进行阻塞来实现MCP规范。主要特性包括：
  * <ul>
- * <li>Synchronous, blocking API for simpler integration in non-reactive applications
- * <li>Tool discovery and invocation for server-provided functionality
- * <li>Resource access and management with URI-based addressing
- * <li>Prompt template handling for standardized AI interactions
- * <li>Real-time notifications for tools, resources, and prompts changes
- * <li>Structured logging with configurable severity levels
+ * <li>同步、阻塞式API，便于在非响应式应用中集成
+ * <li>服务器提供功能的工具发现和调用
+ * <li>基于URI寻址的资源访问和管理
+ * <li>用于标准化AI交互的提示模板处理
+ * <li>工具、资源和提示变更的实时通知
+ * <li>可配置严重级别的结构化日志记录
  * </ul>
  *
  * <p>
- * The client follows the same lifecycle as its async counterpart:
+ * 客户端遵循与其异步对应方相同的生命周期：
  * <ol>
- * <li>Initialization - Establishes connection and negotiates capabilities
- * <li>Normal Operation - Handles requests and notifications
- * <li>Graceful Shutdown - Ensures clean connection termination
+ * <li>初始化 - 建立连接并协商功能
+ * <li>正常运行 - 处理请求和通知
+ * <li>优雅关闭 - 确保连接清理终止
  * </ol>
  *
  * <p>
- * This implementation implements {@link AutoCloseable} for resource cleanup and provides
- * both immediate and graceful shutdown options. All operations block until completion or
- * timeout, making it suitable for traditional synchronous programming models.
+ * 此实现实现了{@link AutoCloseable}接口用于资源清理，并提供了
+ * 即时和优雅关闭选项。所有操作都会阻塞直到完成或超时，使其适用于
+ * 传统的同步编程模型。
  *
  * @author Dariusz Jędrzejczyk
  * @author Christian Tzolov
@@ -55,17 +53,16 @@ public class McpSyncClient implements AutoCloseable {
 
 	private static final Logger logger = LoggerFactory.getLogger(McpSyncClient.class);
 
-	// TODO: Consider providing a client config to set this properly
-	// this is currently a concern only because AutoCloseable is used - perhaps it
-	// is not a requirement?
+	// TODO: 考虑提供客户端配置来正确设置这个值
+	// 这目前只是一个问题，因为使用了AutoCloseable - 也许这
+	// 不是必需的？
 	private static final long DEFAULT_CLOSE_TIMEOUT_MS = 10_000L;
 
 	private final McpAsyncClient delegate;
 
 	/**
-	 * Create a new McpSyncClient with the given delegate.
-	 * @param delegate the asynchronous kernel on top of which this synchronous client
-	 * provides a blocking API.
+	 * 使用给定的委托创建新的McpSyncClient。
+	 * @param delegate 异步内核，此同步客户端在其之上提供阻塞式API。
 	 */
 	McpSyncClient(McpAsyncClient delegate) {
 		Assert.notNull(delegate, "The delegate can not be null");
@@ -73,41 +70,40 @@ public class McpSyncClient implements AutoCloseable {
 	}
 
 	/**
-	 * Get the server capabilities that define the supported features and functionality.
-	 * @return The server capabilities
+	 * 获取定义支持的特性和功能的服务器功能。
+	 * @return 服务器功能
 	 */
 	public McpSchema.ServerCapabilities getServerCapabilities() {
 		return this.delegate.getServerCapabilities();
 	}
 
 	/**
-	 * Get the server instructions that provide guidance to the client on how to interact
-	 * with this server.
-	 * @return The instructions
+	 * 获取为客户端提供如何与此服务器交互指导的服务器指令。
+	 * @return 指令
 	 */
 	public String getServerInstructions() {
 		return this.delegate.getServerInstructions();
 	}
 
 	/**
-	 * Get the server implementation information.
-	 * @return The server implementation details
+	 * 获取服务器实现信息。
+	 * @return 服务器实现详情
 	 */
 	public McpSchema.Implementation getServerInfo() {
 		return this.delegate.getServerInfo();
 	}
 
 	/**
-	 * Get the client capabilities that define the supported features and functionality.
-	 * @return The client capabilities
+	 * 获取定义支持的特性和功能的客户端功能。
+	 * @return 客户端功能
 	 */
 	public ClientCapabilities getClientCapabilities() {
 		return this.delegate.getClientCapabilities();
 	}
 
 	/**
-	 * Get the client implementation information.
-	 * @return The client implementation details
+	 * 获取客户端实现信息。
+	 * @return 客户端实现详情
 	 */
 	public McpSchema.Implementation getClientInfo() {
 		return this.delegate.getClientInfo();
@@ -130,190 +126,188 @@ public class McpSyncClient implements AutoCloseable {
 	}
 
 	/**
-	 * The initialization phase MUST be the first interaction between client and server.
-	 * During this phase, the client and server:
+	 * 初始化阶段必须是客户端和服务器之间的第一次交互。
+	 * 在此阶段，客户端和服务器：
 	 * <ul>
-	 * <li>Establish protocol version compatibility</li>
-	 * <li>Exchange and negotiate capabilities</li>
-	 * <li>Share implementation details</li>
+	 * <li>建立协议版本兼容性</li>
+	 * <li>交换和协商功能</li>
+	 * <li>共享实现细节</li>
 	 * </ul>
 	 * <br/>
-	 * The client MUST initiate this phase by sending an initialize request containing:
+	 * 客户端必须通过发送包含以下内容的初始化请求来启动此阶段：
 	 * <ul>
-	 * <li>The protocol version the client supports</li>
-	 * <li>The client's capabilities</li>
-	 * <li>Client implementation information</li>
+	 * <li>客户端支持的协议版本</li>
+	 * <li>客户端的功能</li>
+	 * <li>客户端实现信息</li>
 	 * </ul>
 	 *
-	 * The server MUST respond with its own capabilities and information:
-	 * {@link McpSchema.ServerCapabilities}. <br/>
-	 * After successful initialization, the client MUST send an initialized notification
-	 * to indicate it is ready to begin normal operations.
+	 * 服务器必须响应其自身的功能和信息：
+	 * {@link McpSchema.ServerCapabilities}。<br/>
+	 * 初始化成功后，客户端必须发送已初始化通知
+	 * 以表明它已准备好开始正常操作。
 	 *
 	 * <br/>
 	 *
 	 * <a href=
-	 * "https://github.com/modelcontextprotocol/specification/blob/main/docs/specification/basic/lifecycle.md#initialization">Initialization
-	 * Spec</a>
-	 * @return the initialize result.
+	 * "https://github.com/modelcontextprotocol/specification/blob/main/docs/specification/basic/lifecycle.md#initialization">初始化
+	 * 规范</a>
+	 * @return 初始化结果。
 	 */
 	public McpSchema.InitializeResult initialize() {
-		// TODO: block takes no argument here as we assume the async client is
-		// configured with a requestTimeout at all times
+		// TODO: 这里block不带参数，因为我们假设异步客户端
+		// 始终配置了requestTimeout
 		return this.delegate.initialize().block();
 	}
 
 	/**
-	 * Send a roots/list_changed notification.
+	 * 发送roots/list_changed通知。
 	 */
 	public void rootsListChangedNotification() {
 		this.delegate.rootsListChangedNotification().block();
 	}
 
 	/**
-	 * Add a roots dynamically.
+	 * 动态添加根目录。
 	 */
 	public void addRoot(McpSchema.Root root) {
 		this.delegate.addRoot(root).block();
 	}
 
 	/**
-	 * Remove a root dynamically.
+	 * 动态移除根目录。
 	 */
 	public void removeRoot(String rootUri) {
 		this.delegate.removeRoot(rootUri).block();
 	}
 
 	/**
-	 * Send a synchronous ping request.
-	 * @return
+	 * 发送同步ping请求。
+	 * @return ping响应
 	 */
 	public Object ping() {
 		return this.delegate.ping().block();
 	}
 
 	// --------------------------
-	// Tools
+	// 工具
 	// --------------------------
 	/**
-	 * Calls a tool provided by the server. Tools enable servers to expose executable
-	 * functionality that can interact with external systems, perform computations, and
-	 * take actions in the real world.
-	 * @param callToolRequest The request containing: - name: The name of the tool to call
-	 * (must match a tool name from tools/list) - arguments: Arguments that conform to the
-	 * tool's input schema
-	 * @return The tool execution result containing: - content: List of content items
-	 * (text, images, or embedded resources) representing the tool's output - isError:
-	 * Boolean indicating if the execution failed (true) or succeeded (false/absent)
+	 * 调用服务器提供的工具。工具使服务器能够暴露可执行的
+	 * 功能，这些功能可以与外部系统交互、执行计算并在
+	 * 真实世界中采取行动。
+	 * @param callToolRequest 请求包含：- name：要调用的工具名称
+	 * （必须匹配tools/list中的工具名称）- arguments：符合工具
+	 * 输入模式的参数
+	 * @return 工具执行结果包含：- content：表示工具输出的内容项列表
+	 * （文本、图像或嵌入资源）- isError：指示执行是否失败（true）
+	 * 或成功（false/absent）的布尔值
 	 */
 	public McpSchema.CallToolResult callTool(McpSchema.CallToolRequest callToolRequest) {
 		return this.delegate.callTool(callToolRequest).block();
 	}
 
 	/**
-	 * Retrieves the list of all tools provided by the server.
-	 * @return The list of tools result containing: - tools: List of available tools, each
-	 * with a name, description, and input schema - nextCursor: Optional cursor for
-	 * pagination if more tools are available
+	 * 获取服务器提供的所有工具列表。
+	 * @return 工具列表结果包含：- tools：可用工具列表，每个工具
+	 * 都有名称、描述和输入模式 - nextCursor：如果有更多工具可用，
+	 * 则为可选的分页游标
 	 */
 	public McpSchema.ListToolsResult listTools() {
 		return this.delegate.listTools().block();
 	}
 
 	/**
-	 * Retrieves a paginated list of tools provided by the server.
-	 * @param cursor Optional pagination cursor from a previous list request
-	 * @return The list of tools result containing: - tools: List of available tools, each
-	 * with a name, description, and input schema - nextCursor: Optional cursor for
-	 * pagination if more tools are available
+	 * 获取服务器提供的分页工具列表。
+	 * @param cursor 来自前一个列表请求的可选分页游标
+	 * @return 工具列表结果包含：- tools：可用工具列表，每个工具
+	 * 都有名称、描述和输入模式 - nextCursor：如果有更多工具可用，
+	 * 则为可选的分页游标
 	 */
 	public McpSchema.ListToolsResult listTools(String cursor) {
 		return this.delegate.listTools(cursor).block();
 	}
 
 	// --------------------------
-	// Resources
+	// 资源
 	// --------------------------
 
 	/**
-	 * Send a resources/list request.
-	 * @param cursor the cursor
-	 * @return the list of resources result.
+	 * 发送resources/list请求。
+	 * @param cursor 游标
+	 * @return 资源列表结果。
 	 */
 	public McpSchema.ListResourcesResult listResources(String cursor) {
 		return this.delegate.listResources(cursor).block();
 	}
 
 	/**
-	 * Send a resources/list request.
-	 * @return the list of resources result.
+	 * 发送resources/list请求。
+	 * @return 资源列表结果。
 	 */
 	public McpSchema.ListResourcesResult listResources() {
 		return this.delegate.listResources().block();
 	}
 
 	/**
-	 * Send a resources/read request.
-	 * @param resource the resource to read
-	 * @return the resource content.
+	 * 发送resources/read请求。
+	 * @param resource 要读取的资源
+	 * @return 资源内容。
 	 */
 	public McpSchema.ReadResourceResult readResource(McpSchema.Resource resource) {
 		return this.delegate.readResource(resource).block();
 	}
 
 	/**
-	 * Send a resources/read request.
-	 * @param readResourceRequest the read resource request.
-	 * @return the resource content.
+	 * 发送resources/read请求。
+	 * @param readResourceRequest 读取资源请求。
+	 * @return 资源内容。
 	 */
 	public McpSchema.ReadResourceResult readResource(McpSchema.ReadResourceRequest readResourceRequest) {
 		return this.delegate.readResource(readResourceRequest).block();
 	}
 
 	/**
-	 * Resource templates allow servers to expose parameterized resources using URI
-	 * templates. Arguments may be auto-completed through the completion API.
+	 * 资源模板允许服务器使用URI模板暴露参数化资源。
+	 * 参数可以通过自动完成API自动补全。
 	 *
-	 * Request a list of resource templates the server has.
-	 * @param cursor the cursor
-	 * @return the list of resource templates result.
+	 * 请求服务器拥有的资源模板列表。
+	 * @param cursor 游标
+	 * @return 资源模板列表结果。
 	 */
 	public McpSchema.ListResourceTemplatesResult listResourceTemplates(String cursor) {
 		return this.delegate.listResourceTemplates(cursor).block();
 	}
 
 	/**
-	 * Request a list of resource templates the server has.
-	 * @return the list of resource templates result.
+	 * 请求服务器拥有的资源模板列表。
+	 * @return 资源模板列表结果。
 	 */
 	public McpSchema.ListResourceTemplatesResult listResourceTemplates() {
 		return this.delegate.listResourceTemplates().block();
 	}
 
 	/**
-	 * Subscriptions. The protocol supports optional subscriptions to resource changes.
-	 * Clients can subscribe to specific resources and receive notifications when they
-	 * change.
+	 * 订阅。协议支持对资源变更的可选订阅。
+	 * 客户端可以订阅特定资源，并在资源发生变更时
+	 * 接收通知。
 	 *
-	 * Send a resources/subscribe request.
-	 * @param subscribeRequest the subscribe request contains the uri of the resource to
-	 * subscribe to.
+	 * 发送resources/subscribe请求。
+	 * @param subscribeRequest 订阅请求包含要订阅的资源的uri。
 	 */
 	public void subscribeResource(McpSchema.SubscribeRequest subscribeRequest) {
 		this.delegate.subscribeResource(subscribeRequest).block();
 	}
 
 	/**
-	 * Send a resources/unsubscribe request.
-	 * @param unsubscribeRequest the unsubscribe request contains the uri of the resource
-	 * to unsubscribe from.
+	 * 发送resources/unsubscribe请求。
+	 * @param unsubscribeRequest 取消订阅请求包含要取消订阅的资源的uri。
 	 */
 	public void unsubscribeResource(McpSchema.UnsubscribeRequest unsubscribeRequest) {
 		this.delegate.unsubscribeResource(unsubscribeRequest).block();
 	}
 
 	// --------------------------
-	// Prompts
+	// 提示
 	// --------------------------
 	public ListPromptsResult listPrompts(String cursor) {
 		return this.delegate.listPrompts(cursor).block();
@@ -328,18 +322,18 @@ public class McpSyncClient implements AutoCloseable {
 	}
 
 	/**
-	 * Client can set the minimum logging level it wants to receive from the server.
-	 * @param loggingLevel the min logging level
+	 * 客户端可以设置它想从服务器接收的最小日志级别。
+	 * @param loggingLevel 最小日志级别
 	 */
 	public void setLoggingLevel(McpSchema.LoggingLevel loggingLevel) {
 		this.delegate.setLoggingLevel(loggingLevel).block();
 	}
 
 	/**
-	 * Send a completion/complete request.
-	 * @param completeRequest the completion request contains the prompt or resource
-	 * reference and arguments for generating suggestions.
-	 * @return the completion result containing suggested values.
+	 * 发送completion/complete请求。
+	 * @param completeRequest 完成请求包含提示或资源引用
+	 * 以及用于生成建议的参数。
+	 * @return 包含建议值的完成结果。
 	 */
 	public McpSchema.CompleteResult completeCompletion(McpSchema.CompleteRequest completeRequest) {
 		return this.delegate.completeCompletion(completeRequest).block();

@@ -1,7 +1,7 @@
 package io.modelcontextprotocol.spec;
 
 /**
- * Marker interface for the server-side MCP transport.
+ * 服务器端MCP传输的标记接口。
  *
  * @author Christian Tzolov
  * @author Dariusz Jędrzejczyk

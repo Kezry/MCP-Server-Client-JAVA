@@ -9,11 +9,11 @@ import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import org.junit.jupiter.api.Timeout;
 
 /**
- * Tests for {@link McpSyncServer} using {@link StdioServerTransportProvider}.
+ * 使用{@link StdioServerTransportProvider}对{@link McpSyncServer}进行测试。
  *
  * @author Christian Tzolov
  */
-@Timeout(15) // Giving extra time beyond the client timeout
+@Timeout(15) // 提供超出客户端超时的额外时间
 class StdioMcpSyncServerTests extends AbstractMcpSyncServerTests {
 
 	@Override

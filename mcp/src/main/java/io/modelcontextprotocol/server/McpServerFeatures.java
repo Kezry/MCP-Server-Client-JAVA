@@ -47,16 +47,16 @@ public class McpServerFeatures {
 			String instructions) {
 
 		/**
-		 * Create an instance and validate the arguments.
-		 * @param serverInfo The server implementation details
-		 * @param serverCapabilities The server capabilities
-		 * @param tools The list of tool specifications
-		 * @param resources The map of resource specifications
-		 * @param resourceTemplates The list of resource templates
-		 * @param prompts The map of prompt specifications
-		 * @param rootsChangeConsumers The list of consumers that will be notified when
-		 * the roots list changes
-		 * @param instructions The server instructions text
+		 * 创建实例并验证参数。
+		 * @param serverInfo 服务器实现详情
+		 * @param serverCapabilities 服务器能力
+		 * @param tools 工具规范列表
+		 * @param resources 资源规范映射
+		 * @param resourceTemplates 资源模板列表
+		 * @param prompts 提示规范映射
+		 * @param completions 完成规范映射
+		 * @param rootsChangeConsumers 当根目录列表发生变化时将被通知的消费者列表
+		 * @param instructions 服务器指令文本
 		 */
 		Async(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
 				List<McpServerFeatures.AsyncToolSpecification> tools, Map<String, AsyncResourceSpecification> resources,
@@ -154,16 +154,16 @@ public class McpServerFeatures {
 			List<BiConsumer<McpSyncServerExchange, List<McpSchema.Root>>> rootsChangeConsumers, String instructions) {
 
 		/**
-		 * Create an instance and validate the arguments.
-		 * @param serverInfo The server implementation details
-		 * @param serverCapabilities The server capabilities
-		 * @param tools The list of tool specifications
-		 * @param resources The map of resource specifications
-		 * @param resourceTemplates The list of resource templates
-		 * @param prompts The map of prompt specifications
-		 * @param rootsChangeConsumers The list of consumers that will be notified when
-		 * the roots list changes
-		 * @param instructions The server instructions text
+		 * 创建实例并验证参数。
+		 * @param serverInfo 服务器实现详情
+		 * @param serverCapabilities 服务器能力
+		 * @param tools 工具规范列表
+		 * @param resources 资源规范映射
+		 * @param resourceTemplates 资源模板列表
+		 * @param prompts 提示规范映射
+		 * @param completions 完成规范映射
+		 * @param rootsChangeConsumers 当根目录列表发生变化时将被通知的消费者列表
+		 * @param instructions 服务器指令文本
 		 */
 		Sync(McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities,
 				List<McpServerFeatures.SyncToolSpecification> tools,
@@ -201,23 +201,22 @@ public class McpServerFeatures {
 	}
 
 	/**
-	 * Specification of a tool with its asynchronous handler function. Tools are the
-	 * primary way for MCP servers to expose functionality to AI models. Each tool
-	 * represents a specific capability, such as:
+	 * 具有异步处理函数的工具规范。工具是MCP服务器向AI模型暴露功能的主要方式。每个工具
+	 * 代表一个特定的能力，例如：
 	 * <ul>
-	 * <li>Performing calculations
-	 * <li>Accessing external APIs
-	 * <li>Querying databases
-	 * <li>Manipulating files
-	 * <li>Executing system commands
+	 * <li>执行计算
+	 * <li>访问外部API
+	 * <li>查询数据库
+	 * <li>操作文件
+	 * <li>执行系统命令
 	 * </ul>
 	 *
 	 * <p>
-	 * Example tool specification: <pre>{@code
+	 * 工具规范示例：<pre>{@code
 	 * new McpServerFeatures.AsyncToolSpecification(
 	 *     new Tool(
 	 *         "calculator",
-	 *         "Performs mathematical calculations",
+	 *         "执行数学计算",
 	 *         new JsonSchemaObject()
 	 *             .required("expression")
 	 *             .property("expression", JsonSchemaType.STRING)
@@ -225,16 +224,15 @@ public class McpServerFeatures {
 	 *     (exchange, args) -> {
 	 *         String expr = (String) args.get("expression");
 	 *         return Mono.fromSupplier(() -> evaluate(expr))
-	 *             .map(result -> new CallToolResult("Result: " + result));
+	 *             .map(result -> new CallToolResult("结果：" + result));
 	 *     }
 	 * )
 	 * }</pre>
 	 *
-	 * @param tool The tool definition including name, description, and parameter schema
-	 * @param call The function that implements the tool's logic, receiving arguments and
-	 * returning results. The function's first argument is an
-	 * {@link McpAsyncServerExchange} upon which the server can interact with the
-	 * connected client. The second arguments is a map of tool arguments.
+	 * @param tool 工具定义，包括名称、描述和参数模式
+	 * @param call 实现工具逻辑的函数，接收参数并返回结果。函数的第一个参数是
+	 * {@link McpAsyncServerExchange}，服务器可以通过它与已连接的客户端交互。
+	 * 第二个参数是工具参数的映射。
 	 */
 	public record AsyncToolSpecification(McpSchema.Tool tool,
 			BiFunction<McpAsyncServerExchange, Map<String, Object>, Mono<McpSchema.CallToolResult>> call) {
@@ -252,31 +250,29 @@ public class McpServerFeatures {
 	}
 
 	/**
-	 * Specification of a resource with its asynchronous handler function. Resources
-	 * provide context to AI models by exposing data such as:
+	 * 具有异步处理函数的资源规范。资源通过暴露以下数据为AI模型提供上下文：
 	 * <ul>
-	 * <li>File contents
-	 * <li>Database records
-	 * <li>API responses
-	 * <li>System information
-	 * <li>Application state
+	 * <li>文件内容
+	 * <li>数据库记录
+	 * <li>API响应
+	 * <li>系统信息
+	 * <li>应用程序状态
 	 * </ul>
 	 *
 	 * <p>
-	 * Example resource specification: <pre>{@code
+	 * 资源规范示例：<pre>{@code
 	 * new McpServerFeatures.AsyncResourceSpecification(
-	 *     new Resource("docs", "Documentation files", "text/markdown"),
+	 *     new Resource("docs", "文档文件", "text/markdown"),
 	 *     (exchange, request) ->
 	 *         Mono.fromSupplier(() -> readFile(request.getPath()))
 	 *             .map(ReadResourceResult::new)
 	 * )
 	 * }</pre>
 	 *
-	 * @param resource The resource definition including name, description, and MIME type
-	 * @param readHandler The function that handles resource read requests. The function's
-	 * first argument is an {@link McpAsyncServerExchange} upon which the server can
-	 * interact with the connected client. The second arguments is a
-	 * {@link io.modelcontextprotocol.spec.McpSchema.ReadResourceRequest}.
+	 * @param resource 资源定义，包括名称、描述和MIME类型
+	 * @param readHandler 处理资源读取请求的函数。函数的第一个参数是
+	 * {@link McpAsyncServerExchange}，服务器可以通过它与已连接的客户端交互。
+	 * 第二个参数是{@link io.modelcontextprotocol.spec.McpSchema.ReadResourceRequest}。
 	 */
 	public record AsyncResourceSpecification(McpSchema.Resource resource,
 			BiFunction<McpAsyncServerExchange, McpSchema.ReadResourceRequest, Mono<McpSchema.ReadResourceResult>> readHandler) {
@@ -294,35 +290,32 @@ public class McpServerFeatures {
 	}
 
 	/**
-	 * Specification of a prompt template with its asynchronous handler function. Prompts
-	 * provide structured templates for AI model interactions, supporting:
+	 * 具有异步处理函数的提示模板规范。提示为AI模型交互提供结构化模板，支持：
 	 * <ul>
-	 * <li>Consistent message formatting
-	 * <li>Parameter substitution
-	 * <li>Context injection
-	 * <li>Response formatting
-	 * <li>Instruction templating
+	 * <li>一致的消息格式化
+	 * <li>参数替换
+	 * <li>上下文注入
+	 * <li>响应格式化
+	 * <li>指令模板化
 	 * </ul>
 	 *
 	 * <p>
-	 * Example prompt specification: <pre>{@code
+	 * 提示规范示例：<pre>{@code
 	 * new McpServerFeatures.AsyncPromptSpecification(
-	 *     new Prompt("analyze", "Code analysis template"),
+	 *     new Prompt("analyze", "代码分析模板"),
 	 *     (exchange, request) -> {
 	 *         String code = request.getArguments().get("code");
 	 *         return Mono.just(new GetPromptResult(
-	 *             "Analyze this code:\n\n" + code + "\n\nProvide feedback on:"
+	 *             "分析这段代码：\n\n" + code + "\n\n提供以下反馈："
 	 *         ));
 	 *     }
 	 * )
 	 * }</pre>
 	 *
-	 * @param prompt The prompt definition including name and description
-	 * @param promptHandler The function that processes prompt requests and returns
-	 * formatted templates. The function's first argument is an
-	 * {@link McpAsyncServerExchange} upon which the server can interact with the
-	 * connected client. The second arguments is a
-	 * {@link io.modelcontextprotocol.spec.McpSchema.GetPromptRequest}.
+	 * @param prompt 提示定义，包括名称和描述
+	 * @param promptHandler 处理提示请求并返回格式化模板的函数。函数的第一个参数是
+	 * {@link McpAsyncServerExchange}，服务器可以通过它与已连接的客户端交互。
+	 * 第二个参数是{@link io.modelcontextprotocol.spec.McpSchema.GetPromptRequest}。
 	 */
 	public record AsyncPromptSpecification(McpSchema.Prompt prompt,
 			BiFunction<McpAsyncServerExchange, McpSchema.GetPromptRequest, Mono<McpSchema.GetPromptResult>> promptHandler) {
@@ -340,31 +333,28 @@ public class McpServerFeatures {
 	}
 
 	/**
-	 * Specification of a completion handler function with asynchronous execution support.
-	 * Completions generate AI model outputs based on prompt or resource references and
-	 * user-provided arguments. This abstraction enables:
+	 * 具有异步执行支持的完成处理函数规范。完成功能根据提示或资源引用以及
+	 * 用户提供的参数生成AI模型输出。这种抽象支持：
 	 * <ul>
-	 * <li>Customizable response generation logic
-	 * <li>Parameter-driven template expansion
-	 * <li>Dynamic interaction with connected clients
+	 * <li>可定制的响应生成逻辑
+	 * <li>参数驱动的模板扩展
+	 * <li>与已连接客户端的动态交互
 	 * </ul>
 	 *
-	 * @param referenceKey The unique key representing the completion reference.
-	 * @param completionHandler The asynchronous function that processes completion
-	 * requests and returns results. The first argument is an
-	 * {@link McpAsyncServerExchange} used to interact with the client. The second
-	 * argument is a {@link io.modelcontextprotocol.spec.McpSchema.CompleteRequest}.
+	 * @param referenceKey 表示完成引用的唯一键
+	 * @param completionHandler 处理完成请求并返回结果的异步函数。第一个参数是
+	 * {@link McpAsyncServerExchange}，用于与客户端交互。第二个参数是
+	 * {@link io.modelcontextprotocol.spec.McpSchema.CompleteRequest}。
 	 */
 	public record AsyncCompletionSpecification(McpSchema.CompleteReference referenceKey,
 			BiFunction<McpAsyncServerExchange, McpSchema.CompleteRequest, Mono<McpSchema.CompleteResult>> completionHandler) {
 
 		/**
-		 * Converts a synchronous {@link SyncCompletionSpecification} into an
-		 * {@link AsyncCompletionSpecification} by wrapping the handler in a bounded
-		 * elastic scheduler for safe non-blocking execution.
-		 * @param completion the synchronous completion specification
-		 * @return an asynchronous wrapper of the provided sync specification, or
-		 * {@code null} if input is null
+		 * 通过将处理程序包装在有界弹性调度器中以实现安全的非阻塞执行，
+		 * 将同步的{@link SyncCompletionSpecification}转换为
+		 * {@link AsyncCompletionSpecification}。
+		 * @param completion 同步完成规范
+		 * @return 提供的同步规范的异步包装器，如果输入为null则返回{@code null}
 		 */
 		static AsyncCompletionSpecification fromSync(SyncCompletionSpecification completion) {
 			if (completion == null) {
@@ -378,59 +368,56 @@ public class McpServerFeatures {
 	}
 
 	/**
-	 * Specification of a tool with its synchronous handler function. Tools are the
-	 * primary way for MCP servers to expose functionality to AI models. Each tool
-	 * represents a specific capability, such as:
+	 * 具有同步处理函数的工具规范。工具是MCP服务器向AI模型暴露功能的主要方式。每个工具
+	 * 代表一个特定的能力，例如：
 	 * <ul>
-	 * <li>Performing calculations
-	 * <li>Accessing external APIs
-	 * <li>Querying databases
-	 * <li>Manipulating files
-	 * <li>Executing system commands
+	 * <li>执行计算
+	 * <li>访问外部API
+	 * <li>查询数据库
+	 * <li>操作文件
+	 * <li>执行系统命令
 	 * </ul>
 	 *
 	 * <p>
-	 * Example tool specification: <pre>{@code
+	 * 工具规范示例：<pre>{@code
 	 * new McpServerFeatures.SyncToolSpecification(
 	 *     new Tool(
 	 *         "calculator",
-	 *         "Performs mathematical calculations",
+	 *         "执行数学计算",
 	 *         new JsonSchemaObject()
 	 *             .required("expression")
 	 *             .property("expression", JsonSchemaType.STRING)
 	 *     ),
 	 *     (exchange, args) -> {
 	 *         String expr = (String) args.get("expression");
-	 *         return new CallToolResult("Result: " + evaluate(expr));
+	 *         return new CallToolResult("结果：" + evaluate(expr));
 	 *     }
 	 * )
 	 * }</pre>
 	 *
-	 * @param tool The tool definition including name, description, and parameter schema
-	 * @param call The function that implements the tool's logic, receiving arguments and
-	 * returning results. The function's first argument is an
-	 * {@link McpSyncServerExchange} upon which the server can interact with the connected
-	 * client. The second arguments is a map of arguments passed to the tool.
+	 * @param tool 工具定义，包括名称、描述和参数模式
+	 * @param call 实现工具逻辑的函数，接收参数并返回结果。函数的第一个参数是
+	 * {@link McpSyncServerExchange}，服务器可以通过它与已连接的客户端交互。
+	 * 第二个参数是传递给工具的参数映射。
 	 */
 	public record SyncToolSpecification(McpSchema.Tool tool,
 			BiFunction<McpSyncServerExchange, Map<String, Object>, McpSchema.CallToolResult> call) {
 	}
 
 	/**
-	 * Specification of a resource with its synchronous handler function. Resources
-	 * provide context to AI models by exposing data such as:
+	 * 具有同步处理函数的资源规范。资源通过暴露以下数据为AI模型提供上下文：
 	 * <ul>
-	 * <li>File contents
-	 * <li>Database records
-	 * <li>API responses
-	 * <li>System information
-	 * <li>Application state
+	 * <li>文件内容
+	 * <li>数据库记录
+	 * <li>API响应
+	 * <li>系统信息
+	 * <li>应用程序状态
 	 * </ul>
 	 *
 	 * <p>
-	 * Example resource specification: <pre>{@code
+	 * 资源规范示例：<pre>{@code
 	 * new McpServerFeatures.SyncResourceSpecification(
-	 *     new Resource("docs", "Documentation files", "text/markdown"),
+	 *     new Resource("docs", "文档文件", "text/markdown"),
 	 *     (exchange, request) -> {
 	 *         String content = readFile(request.getPath());
 	 *         return new ReadResourceResult(content);
@@ -438,59 +425,54 @@ public class McpServerFeatures {
 	 * )
 	 * }</pre>
 	 *
-	 * @param resource The resource definition including name, description, and MIME type
-	 * @param readHandler The function that handles resource read requests. The function's
-	 * first argument is an {@link McpSyncServerExchange} upon which the server can
-	 * interact with the connected client. The second arguments is a
-	 * {@link io.modelcontextprotocol.spec.McpSchema.ReadResourceRequest}.
+	 * @param resource 资源定义，包括名称、描述和MIME类型
+	 * @param readHandler 处理资源读取请求的函数。函数的第一个参数是
+	 * {@link McpSyncServerExchange}，服务器可以通过它与已连接的客户端交互。
+	 * 第二个参数是{@link io.modelcontextprotocol.spec.McpSchema.ReadResourceRequest}。
 	 */
 	public record SyncResourceSpecification(McpSchema.Resource resource,
 			BiFunction<McpSyncServerExchange, McpSchema.ReadResourceRequest, McpSchema.ReadResourceResult> readHandler) {
 	}
 
 	/**
-	 * Specification of a prompt template with its synchronous handler function. Prompts
-	 * provide structured templates for AI model interactions, supporting:
+	 * 具有同步处理函数的提示模板规范。提示为AI模型交互提供结构化模板，支持：
 	 * <ul>
-	 * <li>Consistent message formatting
-	 * <li>Parameter substitution
-	 * <li>Context injection
-	 * <li>Response formatting
-	 * <li>Instruction templating
+	 * <li>一致的消息格式化
+	 * <li>参数替换
+	 * <li>上下文注入
+	 * <li>响应格式化
+	 * <li>指令模板化
 	 * </ul>
 	 *
 	 * <p>
-	 * Example prompt specification: <pre>{@code
+	 * 提示规范示例：<pre>{@code
 	 * new McpServerFeatures.SyncPromptSpecification(
-	 *     new Prompt("analyze", "Code analysis template"),
+	 *     new Prompt("analyze", "代码分析模板"),
 	 *     (exchange, request) -> {
 	 *         String code = request.getArguments().get("code");
 	 *         return new GetPromptResult(
-	 *             "Analyze this code:\n\n" + code + "\n\nProvide feedback on:"
+	 *             "分析这段代码：\n\n" + code + "\n\n提供以下反馈："
 	 *         );
 	 *     }
 	 * )
 	 * }</pre>
 	 *
-	 * @param prompt The prompt definition including name and description
-	 * @param promptHandler The function that processes prompt requests and returns
-	 * formatted templates. The function's first argument is an
-	 * {@link McpSyncServerExchange} upon which the server can interact with the connected
-	 * client. The second arguments is a
-	 * {@link io.modelcontextprotocol.spec.McpSchema.GetPromptRequest}.
+	 * @param prompt 提示定义，包括名称和描述
+	 * @param promptHandler 处理提示请求并返回格式化模板的函数。函数的第一个参数是
+	 * {@link McpSyncServerExchange}，服务器可以通过它与已连接的客户端交互。
+	 * 第二个参数是{@link io.modelcontextprotocol.spec.McpSchema.GetPromptRequest}。
 	 */
 	public record SyncPromptSpecification(McpSchema.Prompt prompt,
 			BiFunction<McpSyncServerExchange, McpSchema.GetPromptRequest, McpSchema.GetPromptResult> promptHandler) {
 	}
 
 	/**
-	 * Specification of a completion handler function with synchronous execution support.
+	 * 具有同步执行支持的完成处理函数规范。
 	 *
-	 * @param referenceKey The unique key representing the completion reference.
-	 * @param completionHandler The synchronous function that processes completion
-	 * requests and returns results. The first argument is an
-	 * {@link McpSyncServerExchange} used to interact with the client. The second argument
-	 * is a {@link io.modelcontextprotocol.spec.McpSchema.CompleteRequest}.
+	 * @param referenceKey 表示完成引用的唯一键
+	 * @param completionHandler 处理完成请求并返回结果的同步函数。第一个参数是
+	 * {@link McpSyncServerExchange}，用于与客户端交互。第二个参数是
+	 * {@link io.modelcontextprotocol.spec.McpSchema.CompleteRequest}。
 	 */
 	public record SyncCompletionSpecification(McpSchema.CompleteReference referenceKey,
 			BiFunction<McpSyncServerExchange, McpSchema.CompleteRequest, McpSchema.CompleteResult> completionHandler) {

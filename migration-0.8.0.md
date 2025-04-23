@@ -1,42 +1,42 @@
-# MCP Java SDK Migration Guide: 0.7.0 to 0.8.0
+# MCP Java SDK 迁移指南：0.7.0 到 0.8.0
 
-This document outlines the breaking changes and provides guidance on how to migrate your code from version 0.7.0 to 0.8.0.
+本文档概述了重大变更，并提供了如何将代码从0.7.0版本迁移到0.8.0版本的指导。
 
-The 0.8.0 refactoring introduces a session-based architecture for server-side MCP implementations.
-It improves the SDK's ability to handle multiple concurrent client connections and provides an API better aligned with the MCP specification.
-The main changes include:
+0.8.0重构引入了基于会话的服务器端MCP实现架构。
+它改进了SDK处理多个并发客户端连接的能力，并提供了更好地与MCP规范保持一致的API。
+主要变更包括：
 
-1. Introduction of a session-based architecture
-2. New transport provider abstraction
-3. Exchange objects for client interaction
-4. Renamed and reorganized interfaces
-5. Updated handler signatures
+1. 引入基于会话的架构
+2. 新的传输提供者抽象
+3. 用于客户端交互的Exchange对象
+4. 重命名和重组接口
+5. 更新处理程序签名
 
-## Breaking Changes
+## 重大变更
 
-### 1. Interface Renaming
+### 1. 接口重命名
 
-Several interfaces have been renamed to better reflect their roles:
+几个接口已被重命名以更好地反映其角色：
 
-| 0.7.0 (Old) | 0.8.0 (New) |
+| 0.7.0 (旧) | 0.8.0 (新) |
 |-------------|-------------|
 | `ClientMcpTransport` | `McpClientTransport` |
 | `ServerMcpTransport` | `McpServerTransport` |
 | `DefaultMcpSession` | `McpClientSession`, `McpServerSession` |
 
-### 2. New Server Transport Architecture
+### 2. 新的服务器传输架构
 
-The most significant change is the introduction of the `McpServerTransportProvider` interface, which replaces direct usage of `ServerMcpTransport` when creating servers. This new pattern separates the concerns of:
+最显著的变化是引入了`McpServerTransportProvider`接口，它取代了创建服务器时直接使用`ServerMcpTransport`。这种新模式分离了以下关注点：
 
-1. **Transport Provider**: Manages connections with clients and creates individual transports for each connection
-2. **Server Transport**: Handles communication with a specific client connection
+1. **传输提供者**：管理与客户端的连接并为每个连接创建单独的传输
+2. **服务器传输**：处理与特定客户端连接的通信
 
-| 0.7.0 (Old) | 0.8.0 (New) |
+| 0.7.0 (旧) | 0.8.0 (新) |
 |-------------|-------------|
 | `ServerMcpTransport` | `McpServerTransportProvider` + `McpServerTransport` |
-| Direct transport usage | Session-based transport usage |
+| 直接传输使用 | 基于会话的传输使用 |
 
-#### Before (0.7.0):
+#### 之前 (0.7.0)：
 
 ```java
 // Create a transport
@@ -48,7 +48,7 @@ McpServer.sync(transport)
     .build();
 ```
 
-#### After (0.8.0):
+#### 之后 (0.8.0)：
 
 ```java
 // Create a transport provider
@@ -60,17 +60,17 @@ McpServer.sync(transportProvider)
     .build();
 ```
 
-### 3. Handler Method Signature Changes
+### 3. 处理程序方法签名变更
 
-Tool, resource, and prompt handlers now receive an additional `exchange` parameter that provides access to client capabilities and methods to interact with the client:
+工具、资源和提示处理程序现在接收一个额外的`exchange`参数，该参数提供对客户端功能的访问和与客户端交互的方法：
 
-| 0.7.0 (Old) | 0.8.0 (New) |
+| 0.7.0 (旧) | 0.8.0 (新) |
 |-------------|-------------|
 | `(args) -> result` | `(exchange, args) -> result` |
 
-The exchange objects (`McpAsyncServerExchange` and `McpSyncServerExchange`) provide context for the current session and access to session-specific operations.
+Exchange对象（`McpAsyncServerExchange`和`McpSyncServerExchange`）为当前会话提供上下文并访问会话特定的操作。
 
-#### Before (0.7.0):
+#### 之前 (0.7.0)：
 
 ```java
 // Tool handler
@@ -83,7 +83,7 @@ The exchange objects (`McpAsyncServerExchange` and `McpSyncServerExchange`) prov
 .prompt(analysisPrompt, req -> new GetPromptResult("Analysis prompt"))
 ```
 
-#### After (0.8.0):
+#### 之后 (0.8.0)：
 
 ```java
 // Tool handler
@@ -96,11 +96,11 @@ The exchange objects (`McpAsyncServerExchange` and `McpSyncServerExchange`) prov
 .prompt(analysisPrompt, (exchange, req) -> new GetPromptResult("Analysis prompt"))
 ```
 
-### 4. Registration vs. Specification
+### 4. 注册与规范
 
-The naming convention for handlers has changed from "Registration" to "Specification":
+处理程序的命名约定从"Registration"更改为"Specification"：
 
-| 0.7.0 (Old) | 0.8.0 (New) |
+| 0.7.0 (旧) | 0.8.0 (新) |
 |-------------|-------------|
 | `AsyncToolRegistration` | `AsyncToolSpecification` |
 | `SyncToolRegistration` | `SyncToolSpecification` |
@@ -109,60 +109,60 @@ The naming convention for handlers has changed from "Registration" to "Specifica
 | `AsyncPromptRegistration` | `AsyncPromptSpecification` |
 | `SyncPromptRegistration` | `SyncPromptSpecification` |
 
-### 5. Roots Change Handler Updates
+### 5. Roots变更处理程序更新
 
-The roots change handlers now receive an exchange parameter:
+Roots变更处理程序现在接收一个exchange参数：
 
-#### Before (0.7.0):
+#### 之前 (0.7.0)：
 
 ```java
 .rootsChangeConsumers(List.of(
     roots -> {
-        // Process roots
+        // 处理roots
     }
 ))
 ```
 
-#### After (0.8.0):
+#### 之后 (0.8.0)：
 
 ```java
 .rootsChangeHandlers(List.of(
     (exchange, roots) -> {
-        // Process roots with access to exchange
+        // 使用exchange访问处理roots
     }
 ))
 ```
 
-### 6. Server Creation Method Changes
+### 6. 服务器创建方法变更
 
-The `McpServer` factory methods now accept `McpServerTransportProvider` instead of `ServerMcpTransport`:
+`McpServer`工厂方法现在接受`McpServerTransportProvider`而不是`ServerMcpTransport`：
 
-| 0.7.0 (Old) | 0.8.0 (New) |
+| 0.7.0 (旧) | 0.8.0 (新) |
 |-------------|-------------|
 | `McpServer.async(ServerMcpTransport)` | `McpServer.async(McpServerTransportProvider)` |
 | `McpServer.sync(ServerMcpTransport)` | `McpServer.sync(McpServerTransportProvider)` |
 
-The method names for creating servers have been updated:
+创建服务器的方法名已更新：
 
-Root change handlers now receive an exchange object:
+Roots变更处理程序现在接收一个exchange对象：
 
-| 0.7.0 (Old) | 0.8.0 (New) |
+| 0.7.0 (旧) | 0.8.0 (新) |
 |-------------|-------------|
 | `rootsChangeConsumers(List<Consumer<List<Root>>>)` | `rootsChangeHandlers(List<BiConsumer<McpSyncServerExchange, List<Root>>>)` |
 | `rootsChangeConsumer(Consumer<List<Root>>)` | `rootsChangeHandler(BiConsumer<McpSyncServerExchange, List<Root>>)` |
 
-### 7. Direct Server Methods Moving to Exchange
+### 7. 直接服务器方法移至Exchange
 
-Several methods that were previously available directly on the server are now accessed through the exchange object:
+以前直接在服务器上可用的几个方法现在通过exchange对象访问：
 
-| 0.7.0 (Old) | 0.8.0 (New) |
+| 0.7.0 (旧) | 0.8.0 (新) |
 |-------------|-------------|
 | `server.listRoots()` | `exchange.listRoots()` |
 | `server.createMessage()` | `exchange.createMessage()` |
 | `server.getClientCapabilities()` | `exchange.getClientCapabilities()` |
 | `server.getClientInfo()` | `exchange.getClientInfo()` |
 
-The direct methods are deprecated and will be removed in 0.9.0:
+以下直接方法已弃用，将在0.9.0中移除：
 
 - `McpSyncServer.listRoots()`
 - `McpSyncServer.getClientCapabilities()`
@@ -173,30 +173,30 @@ The direct methods are deprecated and will be removed in 0.9.0:
 - `McpAsyncServer.getClientInfo()`
 - `McpAsyncServer.createMessage()`
 
-## Deprecation Notices
+## 弃用通知
 
-The following components are deprecated in 0.8.0 and will be removed in 0.9.0:
+以下组件在0.8.0中已弃用，将在0.9.0中移除：
 
-- `ClientMcpTransport` interface (use `McpClientTransport` instead)
-- `ServerMcpTransport` interface (use `McpServerTransport` instead)
-- `DefaultMcpSession` class (use `McpClientSession` instead)
-- `WebFluxSseServerTransport` class (use `WebFluxSseServerTransportProvider` instead)
-- `WebMvcSseServerTransport` class (use `WebMvcSseServerTransportProvider` instead)
-- `StdioServerTransport` class (use `StdioServerTransportProvider` instead)
-- All `*Registration` classes (use corresponding `*Specification` classes instead)
-- Direct server methods for client interaction (use exchange object instead)
+- `ClientMcpTransport`接口（改用`McpClientTransport`）
+- `ServerMcpTransport`接口（改用`McpServerTransport`）
+- `DefaultMcpSession`类（改用`McpClientSession`）
+- `WebFluxSseServerTransport`类（改用`WebFluxSseServerTransportProvider`）
+- `WebMvcSseServerTransport`类（改用`WebMvcSseServerTransportProvider`）
+- `StdioServerTransport`类（改用`StdioServerTransportProvider`）
+- 所有`*Registration`类（改用相应的`*Specification`类）
+- 用于客户端交互的直接服务器方法（改用exchange对象）
 
-## Migration Examples
+## 迁移示例
 
-### Example 1: Creating a Server
+### 示例1：创建服务器
 
-#### Before (0.7.0):
+#### 之前 (0.7.0)：
 
 ```java
-// Create a transport
+// 创建传输
 ServerMcpTransport transport = new WebFluxSseServerTransport(objectMapper, "/mcp/message");
 
-// Create a server with the transport
+// 使用传输创建服务器
 var server = McpServer.sync(transport)
     .serverInfo("my-server", "1.0.0")
     .tool(calculatorTool, args -> new CallToolResult("Result: " + calculate(args)))
@@ -205,21 +205,21 @@ var server = McpServer.sync(transport)
     ))
     .build();
 
-// Get client capabilities directly from server
+// 直接从服务器获取客户端功能
 ClientCapabilities capabilities = server.getClientCapabilities();
 ```
 
-#### After (0.8.0):
+#### 之后 (0.8.0)：
 
 ```java
-// Create a transport provider
+// 创建传输提供者
 McpServerTransportProvider transportProvider = new WebFluxSseServerTransportProvider(objectMapper, "/mcp/message");
 
-// Create a server with the transport provider
+// 使用传输提供者创建服务器
 var server = McpServer.sync(transportProvider)
     .serverInfo("my-server", "1.0.0")
     .tool(calculatorTool, (exchange, args) -> {
-        // Get client capabilities from exchange
+        // 从exchange获取客户端功能
         ClientCapabilities capabilities = exchange.getClientCapabilities();
         return new CallToolResult("Result: " + calculate(args));
     })
@@ -229,16 +229,16 @@ var server = McpServer.sync(transportProvider)
     .build();
 ```
 
-### Example 2: Implementing a Tool with Client Interaction
+### 示例2：实现带有客户端交互的工具
 
-#### Before (0.7.0):
+#### 之前 (0.7.0)：
 
 ```java
 McpServerFeatures.SyncToolRegistration tool = new McpServerFeatures.SyncToolRegistration(
     new Tool("weather", "Get weather information", schema),
     args -> {
         String location = (String) args.get("location");
-        // Cannot interact with client from here
+        // 无法从这里与客户端交互
         return new CallToolResult("Weather for " + location + ": Sunny");
     }
 );
@@ -247,11 +247,11 @@ var server = McpServer.sync(transport)
     .tools(tool)
     .build();
 
-// Separate call to create a message
+// 单独调用创建消息
 CreateMessageResult result = server.createMessage(new CreateMessageRequest(...));
 ```
 
-#### After (0.8.0):
+#### 之后 (0.8.0)：
 
 ```java
 McpServerFeatures.SyncToolSpecification tool = new McpServerFeatures.SyncToolSpecification(
@@ -259,7 +259,7 @@ McpServerFeatures.SyncToolSpecification tool = new McpServerFeatures.SyncToolSpe
     (exchange, args) -> {
         String location = (String) args.get("location");
         
-        // Can interact with client directly from the tool handler
+        // 可以直接从工具处理程序与客户端交互
         CreateMessageResult result = exchange.createMessage(new CreateMessageRequest(...));
         
         return new CallToolResult("Weather for " + location + ": " + result.content());
@@ -271,11 +271,11 @@ var server = McpServer.sync(transportProvider)
     .build();
 ```
 
-### Example 3: Converting Existing Registration Classes
+### 示例3：转换现有注册类
 
-If you have custom implementations of the registration classes, you can convert them to the new specification classes:
+如果您有自定义的注册类实现，可以将它们转换为新的规范类：
 
-#### Before (0.7.0):
+#### 之前 (0.7.0)：
 
 ```java
 McpServerFeatures.AsyncToolRegistration toolReg = new McpServerFeatures.AsyncToolRegistration(
@@ -289,40 +289,40 @@ McpServerFeatures.AsyncResourceRegistration resourceReg = new McpServerFeatures.
 );
 ```
 
-#### After (0.8.0):
+#### 之后 (0.8.0)：
 
 ```java
-// Option 1: Create new specification directly
+// 选项1：直接创建新的规范
 McpServerFeatures.AsyncToolSpecification toolSpec = new McpServerFeatures.AsyncToolSpecification(
     tool,
     (exchange, args) -> Mono.just(new CallToolResult("Result"))
 );
 
-// Option 2: Convert from existing registration (during transition)
-McpServerFeatures.AsyncToolRegistration oldToolReg = /* existing registration */;
+// 选项2：从现有注册转换（在过渡期间）
+McpServerFeatures.AsyncToolRegistration oldToolReg = /* 现有注册 */;
 McpServerFeatures.AsyncToolSpecification toolSpec = oldToolReg.toSpecification();
 
-// Similarly for resources
+// 资源的处理方式类似
 McpServerFeatures.AsyncResourceSpecification resourceSpec = new McpServerFeatures.AsyncResourceSpecification(
     resource,
     (exchange, req) -> Mono.just(new ReadResourceResult(List.of()))
 );
 ```
 
-## Architecture Changes
+## 架构变更
 
-### Session-Based Architecture
+### 基于会话的架构
 
-In 0.8.0, the MCP Java SDK introduces a session-based architecture where each client connection has its own session. This allows for better isolation between clients and more efficient resource management.
+在0.8.0中，MCP Java SDK引入了基于会话的架构，每个客户端连接都有自己的会话。这允许更好地隔离客户端并更有效地管理资源。
 
-The `McpServerTransportProvider` is responsible for creating `McpServerTransport` instances for each session, and the `McpServerSession` manages the communication with a specific client.
+`McpServerTransportProvider`负责为每个会话创建`McpServerTransport`实例，而`McpServerSession`管理与特定客户端的通信。
 
-### Exchange Objects
+### Exchange对象
 
-The new exchange objects (`McpAsyncServerExchange` and `McpSyncServerExchange`) provide access to client-specific information and methods. They are passed to handler functions as the first parameter, allowing handlers to interact with the specific client that made the request.
+新的exchange对象（`McpAsyncServerExchange`和`McpSyncServerExchange`）提供对客户端特定信息和方法的访问。它们作为第一个参数传递给处理程序函数，允许处理程序与发出请求的特定客户端进行交互。
 
-## Conclusion
+## 结论
 
-The changes in version 0.8.0 represent a significant architectural improvement to the MCP Java SDK. While they require some code changes, the new design provides a more flexible and maintainable foundation for building MCP applications.
+0.8.0版本的变更代表了MCP Java SDK的重要架构改进。虽然这些变更需要一些代码修改，但新的设计为构建MCP应用程序提供了更灵活和可维护的基础。
 
-For assistance with migration or to report issues, please open an issue on the GitHub repository.
+如需迁移帮助或报告问题，请在GitHub仓库上开启一个issue。

@@ -9,27 +9,24 @@ import io.modelcontextprotocol.spec.McpSchema.JSONRPCMessage;
 import reactor.core.publisher.Mono;
 
 /**
- * Defines the asynchronous transport layer for the Model Context Protocol (MCP).
+ * 定义模型上下文协议(MCP)的异步传输层。
  *
  * <p>
- * The McpTransport interface provides the foundation for implementing custom transport
- * mechanisms in the Model Context Protocol. It handles the bidirectional communication
- * between the client and server components, supporting asynchronous message exchange
- * using JSON-RPC format.
+ * McpTransport接口为在模型上下文协议中实现自定义传输机制提供了基础。
+ * 它处理客户端和服务器组件之间的双向通信，使用JSON-RPC格式支持异步消息交换。
  * </p>
  *
  * <p>
- * Implementations of this interface are responsible for:
+ * 此接口的实现负责：
  * </p>
  * <ul>
- * <li>Managing the lifecycle of the transport connection</li>
- * <li>Handling incoming messages and errors from the server</li>
- * <li>Sending outbound messages to the server</li>
+ * <li>管理传输连接的生命周期</li>
+ * <li>处理来自服务器的传入消息和错误</li>
+ * <li>向服务器发送出站消息</li>
  * </ul>
  *
  * <p>
- * The transport layer is designed to be protocol-agnostic, allowing for various
- * implementations such as WebSocket, HTTP, or custom protocols.
+ * 传输层设计为协议无关的，允许各种实现，如WebSocket、HTTP或自定义协议。
  * </p>
  *
  * @author Christian Tzolov
@@ -38,11 +35,11 @@ import reactor.core.publisher.Mono;
 public interface McpTransport {
 
 	/**
-	 * Closes the transport connection and releases any associated resources.
+	 * 关闭传输连接并释放任何相关资源。
 	 *
 	 * <p>
-	 * This method ensures proper cleanup of resources when the transport is no longer
-	 * needed. It should handle the graceful shutdown of any active connections.
+	 * 当不再需要传输时，此方法确保正确清理资源。
+	 * 它应该处理任何活动连接的优雅关闭。
 	 * </p>
 	 */
 	default void close() {
@@ -50,30 +47,29 @@ public interface McpTransport {
 	}
 
 	/**
-	 * Closes the transport connection and releases any associated resources
-	 * asynchronously.
-	 * @return a {@link Mono<Void>} that completes when the connection has been closed.
+	 * 异步关闭传输连接并释放任何相关资源。
+	 * @return 当连接关闭时完成的 {@link Mono<Void>}。
 	 */
 	Mono<Void> closeGracefully();
 
 	/**
-	 * Sends a message to the peer asynchronously.
+	 * 异步向对等方发送消息。
 	 *
 	 * <p>
-	 * This method handles the transmission of messages to the server in an asynchronous
-	 * manner. Messages are sent in JSON-RPC format as specified by the MCP protocol.
+	 * 此方法以异步方式处理向服务器发送消息。
+	 * 消息按照MCP协议的规定以JSON-RPC格式发送。
 	 * </p>
-	 * @param message the {@link JSONRPCMessage} to be sent to the server
-	 * @return a {@link Mono<Void>} that completes when the message has been sent
+	 * @param message 要发送到服务器的 {@link JSONRPCMessage}
+	 * @return 当消息发送完成时完成的 {@link Mono<Void>}
 	 */
 	Mono<Void> sendMessage(JSONRPCMessage message);
 
 	/**
-	 * Unmarshals the given data into an object of the specified type.
-	 * @param <T> the type of the object to unmarshal
-	 * @param data the data to unmarshal
-	 * @param typeRef the type reference for the object to unmarshal
-	 * @return the unmarshalled object
+	 * 将给定数据解组为指定类型的对象。
+	 * @param <T> 要解组的对象的类型
+	 * @param data 要解组的数据
+	 * @param typeRef 要解组的对象的类型引用
+	 * @return 解组后的对象
 	 */
 	<T> T unmarshalFrom(Object data, TypeReference<T> typeRef);
 

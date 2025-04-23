@@ -1,27 +1,27 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: 为这个项目提出新功能建议
 title: ''
 labels: 'status: waiting-for-triage, type: feature'
 assignees: ''
 
 ---
 
-Please do a quick search on GitHub issues first, the feature you are about to request might have already been requested.
+请先在GitHub issues中快速搜索，您要请求的功能可能已经被其他人提出过。
 
-**Expected Behavior**
+**预期行为**
 
-<!--- Tell us how it should work. Add a code example to explain what you think the feature should look like. This is optional, but it would help up understand your expectations. -->
+<!--- 告诉我们它应该如何工作。添加代码示例来解释您认为这个功能应该是什么样子。这是可选的，但它会帮助我们理解您的期望。 -->
 
-**Current Behavior**
+**当前行为**
 
-<!--- Explain the difference from current behavior and why do you need this feature (aka why it is not possible to implement the desired functionality with the current version) -->
+<!--- 解释与当前行为的区别，以及为什么您需要这个功能（即为什么无法使用当前版本实现所需功能） -->
 
-**Context**
+**背景**
 
 <!--- 
-How has this issue affected you?
-What are you trying to accomplish?
-What other alternatives have you considered?
-Are you aware of any workarounds?
+这个问题如何影响到您？
+您试图完成什么？
+您考虑过哪些其他替代方案？
+您是否知道任何解决方法？
 -->

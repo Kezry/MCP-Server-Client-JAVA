@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.modelcontextprotocol.util.Assert;
 
 /**
- * Server parameters for stdio client.
+ * stdio客户端的服务器参数。
  *
  * @author Christian Tzolov
  * @author Dariusz Jędrzejczyk
@@ -24,7 +24,7 @@ import io.modelcontextprotocol.util.Assert;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class ServerParameters {
 
-	// Environment variables to inherit by default
+	// 默认继承的环境变量
 	private static final List<String> DEFAULT_INHERITED_ENV_VARS = System.getProperty("os.name")
 		.toLowerCase()
 		.contains("win")
@@ -121,8 +121,7 @@ public class ServerParameters {
 	}
 
 	/**
-	 * Returns a default environment object including only environment variables deemed
-	 * safe to inherit.
+	 * 返回一个默认环境对象，仅包含被认为安全可继承的环境变量。
 	 */
 	private static Map<String, String> getDefaultEnvironment() {
 		return System.getenv()

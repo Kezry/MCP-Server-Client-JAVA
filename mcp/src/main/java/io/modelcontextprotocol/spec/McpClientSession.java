@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2024 the original author or authors.
+ * Copyright 2024-2024 原始作者保留所有权利。
  */
 
 package io.modelcontextprotocol.spec;
@@ -19,17 +19,16 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
 /**
- * Default implementation of the MCP (Model Context Protocol) session that manages
- * bidirectional JSON-RPC communication between clients and servers. This implementation
- * follows the MCP specification for message exchange and transport handling.
+ * MCP（模型上下文协议）会话的默认实现，用于管理客户端和服务器之间的双向JSON-RPC通信。
+ * 此实现遵循MCP规范进行消息交换和传输处理。
  *
  * <p>
- * The session manages:
+ * 该会话管理：
  * <ul>
- * <li>Request/response handling with unique message IDs</li>
- * <li>Notification processing</li>
- * <li>Message timeout management</li>
- * <li>Transport layer abstraction</li>
+ * <li>使用唯一消息ID的请求/响应处理</li>
+ * <li>通知处理</li>
+ * <li>消息超时管理</li>
+ * <li>传输层抽象</li>
  * </ul>
  *
  * @author Christian Tzolov
@@ -37,72 +36,70 @@ import reactor.core.publisher.MonoSink;
  */
 public class McpClientSession implements McpSession {
 
-	/** Logger for this class */
+	/** 该类的日志记录器 */
 	private static final Logger logger = LoggerFactory.getLogger(McpClientSession.class);
 
-	/** Duration to wait for request responses before timing out */
+	/** 等待请求响应超时的持续时间 */
 	private final Duration requestTimeout;
 
-	/** Transport layer implementation for message exchange */
+	/** 用于消息交换的传输层实现 */
 	private final McpClientTransport transport;
 
-	/** Map of pending responses keyed by request ID */
+	/** 以请求ID为键的待处理响应映射 */
 	private final ConcurrentHashMap<Object, MonoSink<McpSchema.JSONRPCResponse>> pendingResponses = new ConcurrentHashMap<>();
 
-	/** Map of request handlers keyed by method name */
+	/** 以方法名为键的请求处理器映射 */
 	private final ConcurrentHashMap<String, RequestHandler<?>> requestHandlers = new ConcurrentHashMap<>();
 
-	/** Map of notification handlers keyed by method name */
+	/** 以方法名为键的通知处理器映射 */
 	private final ConcurrentHashMap<String, NotificationHandler> notificationHandlers = new ConcurrentHashMap<>();
 
-	/** Session-specific prefix for request IDs */
+	/** 请求ID的会话特定前缀 */
 	private final String sessionPrefix = UUID.randomUUID().toString().substring(0, 8);
 
-	/** Atomic counter for generating unique request IDs */
+	/** 用于生成唯一请求ID的原子计数器 */
 	private final AtomicLong requestCounter = new AtomicLong(0);
 
 	private final Disposable connection;
 
 	/**
-	 * Functional interface for handling incoming JSON-RPC requests. Implementations
-	 * should process the request parameters and return a response.
+	 * 用于处理传入JSON-RPC请求的函数式接口。实现类应处理请求参数并返回响应。
 	 *
-	 * @param <T> Response type
+	 * @param <T> 响应类型
 	 */
 	@FunctionalInterface
 	public interface RequestHandler<T> {
 
 		/**
-		 * Handles an incoming request with the given parameters.
-		 * @param params The request parameters
-		 * @return A Mono containing the response object
+		 * 处理具有给定参数的传入请求。
+		 * @param params 请求参数
+		 * @return 包含响应对象的Mono
 		 */
 		Mono<T> handle(Object params);
 
 	}
 
 	/**
-	 * Functional interface for handling incoming JSON-RPC notifications. Implementations
-	 * should process the notification parameters without returning a response.
+	 * 用于处理传入JSON-RPC通知的函数式接口。实现类应处理通知参数而不返回响应。
 	 */
 	@FunctionalInterface
 	public interface NotificationHandler {
 
 		/**
-		 * Handles an incoming notification with the given parameters.
-		 * @param params The notification parameters
-		 * @return A Mono that completes when the notification is processed
+		 * 处理具有给定参数的传入通知。
+		 * @param params 通知参数
+		 * @return 当通知处理完成时完成的Mono
 		 */
 		Mono<Void> handle(Object params);
 
 	}
 
 	/**
-	 * Creates a new McpClientSession with the specified configuration and handlers.
-	 * @param requestTimeout Duration to wait for responses
-	 * @param transport Transport implementation for message exchange
-	 * @param requestHandlers Map of method names to request handlers
-	 * @param notificationHandlers Map of method names to notification handlers
+	 * 使用指定的配置和处理器创建新的McpClientSession。
+	 * @param requestTimeout 等待响应的持续时间
+	 * @param transport 用于消息交换的传输实现
+	 * @param requestHandlers 方法名到请求处理器的映射
+	 * @param notificationHandlers 方法名到通知处理器的映射
 	 */
 	public McpClientSession(Duration requestTimeout, McpClientTransport transport,
 			Map<String, RequestHandler<?>> requestHandlers, Map<String, NotificationHandler> notificationHandlers) {
@@ -152,9 +149,9 @@ public class McpClientSession implements McpSession {
 	}
 
 	/**
-	 * Handles an incoming JSON-RPC request by routing it to the appropriate handler.
-	 * @param request The incoming JSON-RPC request
-	 * @return A Mono containing the JSON-RPC response
+	 * 通过将传入的JSON-RPC请求路由到适当的处理器来处理它。
+	 * @param request 传入的JSON-RPC请求
+	 * @return 包含JSON-RPC响应的Mono
 	 */
 	private Mono<McpSchema.JSONRPCResponse> handleIncomingRequest(McpSchema.JSONRPCRequest request) {
 		return Mono.defer(() -> {
@@ -189,9 +186,9 @@ public class McpClientSession implements McpSession {
 	}
 
 	/**
-	 * Handles an incoming JSON-RPC notification by routing it to the appropriate handler.
-	 * @param notification The incoming JSON-RPC notification
-	 * @return A Mono that completes when the notification is processed
+	 * 通过将传入的JSON-RPC通知路由到适当的处理器来处理它。
+	 * @param notification 传入的JSON-RPC通知
+	 * @return 当通知处理完成时完成的Mono
 	 */
 	private Mono<Void> handleIncomingNotification(McpSchema.JSONRPCNotification notification) {
 		return Mono.defer(() -> {
@@ -205,21 +202,20 @@ public class McpClientSession implements McpSession {
 	}
 
 	/**
-	 * Generates a unique request ID in a non-blocking way. Combines a session-specific
-	 * prefix with an atomic counter to ensure uniqueness.
-	 * @return A unique request ID string
+	 * 以非阻塞方式生成唯一的请求ID。将会话特定的前缀与原子计数器组合以确保唯一性。
+	 * @return 唯一的请求ID字符串
 	 */
 	private String generateRequestId() {
 		return this.sessionPrefix + "-" + this.requestCounter.getAndIncrement();
 	}
 
 	/**
-	 * Sends a JSON-RPC request and returns the response.
-	 * @param <T> The expected response type
-	 * @param method The method name to call
-	 * @param requestParams The request parameters
-	 * @param typeRef Type reference for response deserialization
-	 * @return A Mono containing the response
+	 * 发送JSON-RPC请求并返回响应。
+	 * @param <T> 预期的响应类型
+	 * @param method 要调用的方法名
+	 * @param requestParams 请求参数
+	 * @param typeRef 用于响应反序列化的类型引用
+	 * @return 包含响应的Mono
 	 */
 	@Override
 	public <T> Mono<T> sendRequest(String method, Object requestParams, TypeReference<T> typeRef) {
@@ -253,10 +249,10 @@ public class McpClientSession implements McpSession {
 	}
 
 	/**
-	 * Sends a JSON-RPC notification.
-	 * @param method The method name for the notification
-	 * @param params The notification parameters
-	 * @return A Mono that completes when the notification is sent
+	 * 发送JSON-RPC通知。
+	 * @param method 通知的方法名
+	 * @param params 通知参数
+	 * @return 当通知发送完成时完成的Mono
 	 */
 	@Override
 	public Mono<Void> sendNotification(String method, Object params) {
@@ -266,8 +262,8 @@ public class McpClientSession implements McpSession {
 	}
 
 	/**
-	 * Closes the session gracefully, allowing pending operations to complete.
-	 * @return A Mono that completes when the session is closed
+	 * 优雅地关闭会话，允许待处理的操作完成。
+	 * @return 当会话关闭时完成的Mono
 	 */
 	@Override
 	public Mono<Void> closeGracefully() {
@@ -278,7 +274,7 @@ public class McpClientSession implements McpSession {
 	}
 
 	/**
-	 * Closes the session immediately, potentially interrupting pending operations.
+	 * 立即关闭会话，可能会中断待处理的操作。
 	 */
 	@Override
 	public void close() {
